@@ -14,13 +14,14 @@ import { HYDRO_PLANT_SITE_RULE as CIV1_HYDRO_PLANT_SITE_RULE } from '@civ-clone/
 import { RANSOM_RULE as CIV1_RANSOM_RULE } from '@civ-clone/civ1-barbarians/RuleIds';
 import RuleSet from '@civ-clone/core-rule/RuleSet';
 import cityBuild from './Rules/City/build';
+import { describedRequirements } from './Requirements';
 import playerResearchComplete from './Rules/Player/researchComplete';
 import unitDestroyed from './Rules/Unit/destroyed';
 
 export const register = (game: Game): void => {
   // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
-  //  rules running. The sets before their rules, so each rule is switched as it arrives: the Hydro Plant's starts off. A set of its own
-  //  for each game, as a game may add to its sets.
+  //  rules running. The sets before their rules, so each rule is switched as it arrives: the Hydro Plant's starts off.
+  //  A set of its own for each game, as a game may add to its sets.
   game.ruleSets.register(
     new RuleSet(
       ENHANCED,
@@ -47,6 +48,10 @@ export const register = (game: Game): void => {
     ...playerResearchComplete(game.cities, game.cityBuilds),
     ...unitDestroyed(game)
   );
+
+  // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the
+  //  civilopedia and the reasons a city can't build something follow the rule with the entry's id.
+  game.requirements.add(null, ...describedRequirements);
 };
 
 // The plugin loader imports each package for this side effect, as it does `registerRules` elsewhere.

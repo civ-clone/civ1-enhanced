@@ -18,7 +18,8 @@ build rather than leaving both rules running. Its own rule ids are exported the 
 - `civ1-enhanced:hydro-plant-site` (`HYDRO_PLANT_SITE`), off to start with: `civ1-enhanced:city/build/hydro-plant-site`
   lets a city build a Hydro Plant with Mountains or a River on its own square as well as next to it, as the manual's
   "on or near" has it. Supersedes `civ1-city-improvement:city/build/hydro-plant-site`, which, as v474.05, looks only
-  at the eight squares around the city.
+  at the eight squares around the city. Its `requirements` entry (`Requirements.hydroPlantSite`, condition
+  `civ1-enhanced:mountains-or-river-on-or-nearby`) likewise takes the place of `civ1-city-improvement`'s while it is on.
 - `civ1-enhanced:barbarian-leader-ransom` (`BARBARIAN_LEADER_RANSOM`), on to start with:
   `civ1-enhanced:unit/destroyed/ransom` pays a civilization 100 gold for a barbarian leader it kills however he dies,
   in a stack that another unit defended too (civ-clone/web-renderer#171), through `civ1-barbarians`' `lib/ransom`, so

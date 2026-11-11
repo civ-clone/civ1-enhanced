@@ -6,6 +6,15 @@ import { Game } from '@civ-clone/core-game/Game';
 import { ENHANCED, HYDRO_PLANT_SITE } from '../RuleSets';
 import { HydroPlant } from '@civ-clone/civ1-city-improvement/CityImprovements';
 import Tile from '@civ-clone/core-world/Tile';
+import { hydroPlantSite, mountainsOrRiverOnOrNearby } from '../Requirements';
+import AvailableCityBuildItemsRegistry from '@civ-clone/core-city-build/AvailableCityBuildItemsRegistry';
+import Buildable from '@civ-clone/core-city-build/Buildable';
+import CityBuild from '@civ-clone/core-city-build/CityBuild';
+import { HYDRO_PLANT_SITE_RULE } from '../RuleIds';
+import { HYDRO_PLANT_SITE_RULE as CIV1_HYDRO_PLANT_SITE_RULE } from '@civ-clone/civ1-city-improvement/RuleIds';
+import Player from '@civ-clone/core-player/Player';
+import PlayerResearch from '@civ-clone/core-science/PlayerResearch';
+import Requirement from '@civ-clone/core-requirement/Requirement';
 import { expect } from 'chai';
 
 // The site rules that run for a Hydro Plant, each by id, and whether the city may build one by them. The rest of what
@@ -141,6 +150,105 @@ describe('a Hydro Plant site (civ-clone/web-renderer#954)', (): void => {
       expect(
         site(game, await withTerrain(game, Mountains, 'city')).running
       ).to.eql(['civ1-city-improvement:city/build/hydro-plant-site']);
+    });
+  });
+
+  // The page shows an entry while the rule with its id is switched on (web-renderer's `inForce`), and names an entry
+  //  for each rule `CityBuild#unavailable` says refused an item (civ-clone/web-renderer#958).
+  describe('its requirements entry', (): void => {
+    // The Hydro Plant site entries the page would show, by id.
+    const inForce = (game: Game): string[] =>
+      game.requirements
+        .for(HydroPlant)
+        .filter(
+          (entry: Requirement): boolean =>
+            entry.id.endsWith('/hydro-plant-site') &&
+            game.rules.getById(entry.id)?.enabled() !== false
+        )
+        .map((entry: Requirement): string => entry.id);
+
+    // The ids of the rules refusing a Hydro Plant in a city on `tile`, whose player knows nothing.
+    const refusedBy = (game: Game, tile: Tile): (string | null)[] => {
+      const player = new Player(game.rules),
+        city = {
+          player: (): Player => player,
+          tile: (): Tile => tile,
+        } as unknown as City,
+        available = new AvailableCityBuildItemsRegistry();
+
+      game.playerResearch.register(
+        new PlayerResearch(player, game.advances, game.rules)
+      );
+      available.register(HydroPlant as unknown as typeof Buildable);
+
+      return new CityBuild(city, available, game.rules)
+        .unavailable()
+        .filter(({ item }) => item === (HydroPlant as unknown))
+        .flatMap(({ refusedBy }) => refusedBy);
+    };
+
+    it('should describe the rule, with a condition of its own', (): void => {
+      expect(mountainsOrRiverOnOrNearby.id).to.equal(
+        'civ1-enhanced:mountains-or-river-on-or-nearby'
+      );
+      expect(hydroPlantSite.id).to.equal(HYDRO_PLANT_SITE_RULE);
+      expect(hydroPlantSite.subject).to.equal(HydroPlant);
+      expect(hydroPlantSite.relation).to.equal('requires');
+      expect(hydroPlantSite.targets).to.eql([mountainsOrRiverOnOrNearby]);
+      expect(hydroPlantSite.range).to.equal('city');
+
+      const game = loadGame();
+
+      expect(game.requirements.getById(HYDRO_PLANT_SITE_RULE)).to.equal(
+        hydroPlantSite
+      );
+      // Only described: the rule is the hand-written one.
+      expect(game.requirements.rulesFor(HYDRO_PLANT_SITE_RULE)).to.eql([]);
+    });
+
+    it("should be out of force by default, leaving civ1-city-improvement's in force and named as the reason", async (): Promise<void> => {
+      const game = loadGame(),
+        tile = await withTerrain(game, Mountains, 'nowhere');
+
+      expect(inForce(game)).to.eql([CIV1_HYDRO_PLANT_SITE_RULE]);
+      expect(refusedBy(game, tile))
+        .to.include(CIV1_HYDRO_PLANT_SITE_RULE)
+        .and.not.include(HYDRO_PLANT_SITE_RULE);
+    });
+
+    it("should be in force switched on, in civ1-city-improvement's place, and named as the reason with neither on or near the city", async (): Promise<void> => {
+      const game = loadGame();
+
+      game.ruleSets.set(HYDRO_PLANT_SITE, true);
+
+      const tile = await withTerrain(game, Mountains, 'nowhere');
+
+      expect(inForce(game)).to.eql([HYDRO_PLANT_SITE_RULE]);
+      expect(refusedBy(game, tile))
+        .to.include(HYDRO_PLANT_SITE_RULE)
+        .and.not.include(CIV1_HYDRO_PLANT_SITE_RULE);
+
+      // Every reason has an entry in force to say it.
+      refusedBy(game, tile).forEach((id: string | null): void => {
+        expect(game.requirements.getById(id!), id!).not.null;
+        expect(game.rules.getById(id!)!.enabled(), id!).true;
+      });
+
+      game.ruleSets.set(HYDRO_PLANT_SITE, false);
+
+      expect(inForce(game)).to.eql([CIV1_HYDRO_PLANT_SITE_RULE]);
+    });
+
+    it("should name no site reason switched on with Mountains on the city's own square", async (): Promise<void> => {
+      const game = loadGame();
+
+      game.ruleSets.set(HYDRO_PLANT_SITE, true);
+
+      expect(
+        refusedBy(game, await withTerrain(game, Mountains, 'city')).filter(
+          (id: string | null): boolean => id!.endsWith('/hydro-plant-site')
+        )
+      ).to.eql([]);
     });
   });
 });
