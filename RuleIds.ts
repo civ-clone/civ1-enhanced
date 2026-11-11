@@ -11,3 +11,16 @@ export const RANSOM_RULE = 'civ1-enhanced:unit/destroyed/ransom';
 /** A discovery that makes what a city is building obsolete drops the build. */
 export const REVALIDATE_BUILDS_RULE =
   'civ1-enhanced:player/research-complete/revalidate-builds';
+
+/** A city the human captures stops building what it was, and the human chooses. */
+export const CLEAR_CAPTURED_BUILD_RULE =
+  'civ1-enhanced:city/captured/clear-build';
+
+/** Every city may pollute a square around it each turn. */
+export const POLLUTION_RULE = 'civ1-enhanced:city/process-yield/pollution';
+
+/** A barbarian city builds any attacking land unit two civilizations can build. */
+export const RAIDERS_ONLY_RULE = 'civ1-enhanced:city/build/raiders-only';
+
+/** Each turn any civilization's city may see an uprising of barbarians nearby. */
+export const LAND_UPRISING_RULE = 'civ1-enhanced:turn/start/land-uprising';

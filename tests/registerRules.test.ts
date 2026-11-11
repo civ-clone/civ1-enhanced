@@ -1,8 +1,12 @@
 import {
+  BARBARIAN_CITY_BUILDS,
   BARBARIAN_LEADER_RANSOM,
+  BARBARIAN_UPRISINGS,
+  CAPTURED_CITY_BUILD,
   ENHANCED,
   HYDRO_PLANT_SITE,
   OBSOLETE_BUILDS,
+  POLLUTION_IN_EVERY_CITY,
 } from '../RuleSets';
 // The Civ1 rules this package's sets change, and the rules they change them with (civ-clone/web-renderer#954).
 import { Game } from '@civ-clone/core-game/Game';
@@ -11,12 +15,33 @@ import loadGame, { Package, pluginOrder } from './lib/loadGame';
 import register from '../registerRules';
 
 import {
+  CLEAR_CAPTURED_BUILD_RULE,
   HYDRO_PLANT_SITE_RULE,
+  LAND_UPRISING_RULE,
+  POLLUTION_RULE,
+  RAIDERS_ONLY_RULE,
   RANSOM_RULE,
   REVALIDATE_BUILDS_RULE,
 } from '../RuleIds';
-import { HYDRO_PLANT_SITE_RULE as CIV1_HYDRO_PLANT_SITE } from '@civ-clone/civ1-city-improvement/RuleIds';
-import { RANSOM_RULE as CIV1_RANSOM } from '@civ-clone/civ1-barbarians/RuleIds';
+import {
+  HYDRO_PLANT_SITE_RULE as CIV1_HYDRO_PLANT_SITE,
+  POLLUTION_RULE as CIV1_POLLUTION,
+} from '@civ-clone/civ1-city-improvement/RuleIds';
+import {
+  LAND_UPRISING_RULE as CIV1_LAND_UPRISING,
+  RAIDERS_ONLY_RULE as CIV1_RAIDERS_ONLY,
+  RANSOM_RULE as CIV1_RANSOM,
+} from '@civ-clone/civ1-barbarians/RuleIds';
+import { KEEP_BUILD_RULE as CIV1_KEEP_BUILD } from '@civ-clone/civ1-city/RuleIds';
+
+// Each set that takes the place of a Civ1 rule, the rule it takes the place of, and its own: all on to start with.
+const replacements: [string, string, string][] = [
+  [BARBARIAN_LEADER_RANSOM, CIV1_RANSOM, RANSOM_RULE],
+  [CAPTURED_CITY_BUILD, CIV1_KEEP_BUILD, CLEAR_CAPTURED_BUILD_RULE],
+  [POLLUTION_IN_EVERY_CITY, CIV1_POLLUTION, POLLUTION_RULE],
+  [BARBARIAN_CITY_BUILDS, CIV1_RAIDERS_ONLY, RAIDERS_ONLY_RULE],
+  [BARBARIAN_UPRISINGS, CIV1_LAND_UPRISING, LAND_UPRISING_RULE],
+];
 
 const enabled = (game: Game, id: string): boolean =>
   game.rules.getById(id)!.enabled();
@@ -28,7 +53,7 @@ describe('registerRules', (): void => {
     expect((): void => register(game)).not.to.throw();
   });
 
-  it('should hold its three sets under one parent, with the ids exported', (): void => {
+  it('should hold its seven sets under one parent, with the ids exported', (): void => {
     const game = loadGame();
 
     expect(ENHANCED).to.equal('civ1-enhanced');
@@ -37,39 +62,54 @@ describe('registerRules', (): void => {
       'civ1-enhanced:barbarian-leader-ransom'
     );
     expect(OBSOLETE_BUILDS).to.equal('civ1-enhanced:obsolete-builds');
+    expect(CAPTURED_CITY_BUILD).to.equal('civ1-enhanced:captured-city-build');
+    expect(POLLUTION_IN_EVERY_CITY).to.equal(
+      'civ1-enhanced:pollution-in-every-city'
+    );
+    expect(BARBARIAN_CITY_BUILDS).to.equal(
+      'civ1-enhanced:barbarian-city-builds'
+    );
+    expect(BARBARIAN_UPRISINGS).to.equal('civ1-enhanced:barbarian-uprisings');
     expect(game.ruleSets.get(ENHANCED)!.memberIds()).to.eql([
       HYDRO_PLANT_SITE,
       BARBARIAN_LEADER_RANSOM,
       OBSOLETE_BUILDS,
+      CAPTURED_CITY_BUILD,
+      POLLUTION_IN_EVERY_CITY,
+      BARBARIAN_CITY_BUILDS,
+      BARBARIAN_UPRISINGS,
     ]);
     expect(game.ruleSets.get(HYDRO_PLANT_SITE)!.supersedes()).to.eql([
       CIV1_HYDRO_PLANT_SITE,
     ]);
-    expect(game.ruleSets.get(BARBARIAN_LEADER_RANSOM)!.supersedes()).to.eql([
-      CIV1_RANSOM,
-    ]);
     expect(game.ruleSets.get(OBSOLETE_BUILDS)!.supersedes()).to.eql([]);
+    replacements.forEach(([set, civ1Rule, rule]): void => {
+      expect(game.ruleSets.get(set)!.supersedes(), set).to.eql([civ1Rule]);
+      expect(game.ruleSets.get(set)!.memberIds(), set).to.eql([rule]);
+    });
   });
 
-  it('should start as today: the Hydro Plant as v474.05, the ransom and obsolete builds as civ-clone', (): void => {
+  it('should start as today: the Hydro Plant as v474.05, the rest as civ-clone', (): void => {
     const game = loadGame();
 
     expect(game.ruleSets.state(ENHANCED)).to.equal('mixed');
     expect(game.ruleSets.state(HYDRO_PLANT_SITE)).to.equal('off');
-    expect(game.ruleSets.state(BARBARIAN_LEADER_RANSOM)).to.equal('on');
     expect(game.ruleSets.state(OBSOLETE_BUILDS)).to.equal('on');
 
     expect(enabled(game, CIV1_HYDRO_PLANT_SITE)).true;
     expect(enabled(game, HYDRO_PLANT_SITE_RULE)).false;
-    expect(enabled(game, CIV1_RANSOM)).false;
-    expect(enabled(game, RANSOM_RULE)).true;
     expect(enabled(game, REVALIDATE_BUILDS_RULE)).true;
+    replacements.forEach(([set, civ1Rule, rule]): void => {
+      expect(game.ruleSets.state(set), set).to.equal('on');
+      expect(enabled(game, civ1Rule), civ1Rule).false;
+      expect(enabled(game, rule), rule).true;
+    });
 
     // Nothing differs from the defaults, so a save keeps nothing.
     expect(game.ruleSets.choices()).to.eql([]);
   });
 
-  it('should show the parent as mixed, and leave exactly the v474.05 rules running for all three when it is switched off', (): void => {
+  it('should show the parent as mixed, and leave exactly the v474.05 rules running for all seven when it is switched off', (): void => {
     const game = loadGame();
 
     expect(game.ruleSets.state(ENHANCED)).to.equal('mixed');
@@ -79,13 +119,16 @@ describe('registerRules', (): void => {
     expect(game.ruleSets.state(ENHANCED)).to.equal('off');
     expect(enabled(game, CIV1_HYDRO_PLANT_SITE)).true;
     expect(enabled(game, HYDRO_PLANT_SITE_RULE)).false;
-    expect(enabled(game, CIV1_RANSOM)).true;
-    expect(enabled(game, RANSOM_RULE)).false;
     expect(enabled(game, REVALIDATE_BUILDS_RULE)).false;
+    replacements.forEach(([set, civ1Rule, rule]): void => {
+      expect(game.ruleSets.state(set), set).to.equal('off');
+      expect(enabled(game, civ1Rule), civ1Rule).true;
+      expect(enabled(game, rule), rule).false;
+    });
     expect(game.ruleSets.validate()).to.eql([]);
   });
 
-  it('should switch on every enhanced rule when the parent is switched on, and supersede both Civ1 rules', (): void => {
+  it('should switch on every enhanced rule when the parent is switched on, and supersede every Civ1 rule they replace', (): void => {
     const game = loadGame();
 
     game.ruleSets.set(ENHANCED, true);
@@ -93,9 +136,11 @@ describe('registerRules', (): void => {
     expect(game.ruleSets.state(ENHANCED)).to.equal('on');
     expect(enabled(game, CIV1_HYDRO_PLANT_SITE)).false;
     expect(enabled(game, HYDRO_PLANT_SITE_RULE)).true;
-    expect(enabled(game, CIV1_RANSOM)).false;
-    expect(enabled(game, RANSOM_RULE)).true;
     expect(enabled(game, REVALIDATE_BUILDS_RULE)).true;
+    replacements.forEach(([, civ1Rule, rule]): void => {
+      expect(enabled(game, civ1Rule), civ1Rule).false;
+      expect(enabled(game, rule), rule).true;
+    });
     expect(game.ruleSets.validate()).to.eql([]);
   });
 
@@ -105,7 +150,14 @@ describe('registerRules', (): void => {
     const game = loadGame(),
       superseded = game.ruleSets.entries().flatMap((set) => set.supersedes());
 
-    expect(superseded).to.eql([CIV1_HYDRO_PLANT_SITE, CIV1_RANSOM]);
+    expect(superseded).to.eql([
+      CIV1_HYDRO_PLANT_SITE,
+      CIV1_RANSOM,
+      CIV1_KEEP_BUILD,
+      CIV1_POLLUTION,
+      CIV1_RAIDERS_ONLY,
+      CIV1_LAND_UPRISING,
+    ]);
     superseded.forEach((id: string): void => {
       expect(game.rules.getById(id), id).not.to.be.null;
     });
@@ -140,6 +192,26 @@ describe('registerRules', (): void => {
         ids: [BARBARIAN_LEADER_RANSOM, CIV1_RANSOM],
         blocking: false,
       },
+      {
+        kind: 'unknown-superseded',
+        ids: [CAPTURED_CITY_BUILD, CIV1_KEEP_BUILD],
+        blocking: false,
+      },
+      {
+        kind: 'unknown-superseded',
+        ids: [POLLUTION_IN_EVERY_CITY, CIV1_POLLUTION],
+        blocking: false,
+      },
+      {
+        kind: 'unknown-superseded',
+        ids: [BARBARIAN_CITY_BUILDS, CIV1_RAIDERS_ONLY],
+        blocking: false,
+      },
+      {
+        kind: 'unknown-superseded',
+        ids: [BARBARIAN_UPRISINGS, CIV1_LAND_UPRISING],
+        blocking: false,
+      },
     ]);
     expect((): void => game.ruleSets.check()).not.to.throw();
   });
@@ -161,6 +233,9 @@ describe('registerRules', (): void => {
     game.ruleSets.set(HYDRO_PLANT_SITE, true);
     game.ruleSets.set(BARBARIAN_LEADER_RANSOM, false);
     game.ruleSets.set(OBSOLETE_BUILDS, false);
+    // Every other one of the four that started on.
+    game.ruleSets.set(CAPTURED_CITY_BUILD, false);
+    game.ruleSets.set(BARBARIAN_CITY_BUILDS, false);
 
     const choices = game.ruleSets.choices();
 
@@ -168,6 +243,8 @@ describe('registerRules', (): void => {
       { id: HYDRO_PLANT_SITE, value: true },
       { id: BARBARIAN_LEADER_RANSOM, value: false },
       { id: OBSOLETE_BUILDS, value: false },
+      { id: CAPTURED_CITY_BUILD, value: false },
+      { id: BARBARIAN_CITY_BUILDS, value: false },
     ]);
 
     const restored = loadGame();
@@ -179,10 +256,18 @@ describe('registerRules', (): void => {
     expect(enabled(restored, CIV1_RANSOM)).true;
     expect(enabled(restored, RANSOM_RULE)).false;
     expect(enabled(restored, REVALIDATE_BUILDS_RULE)).false;
+    expect(enabled(restored, CIV1_KEEP_BUILD)).true;
+    expect(enabled(restored, CLEAR_CAPTURED_BUILD_RULE)).false;
+    expect(enabled(restored, CIV1_POLLUTION)).false;
+    expect(enabled(restored, POLLUTION_RULE)).true;
+    expect(enabled(restored, CIV1_RAIDERS_ONLY)).true;
+    expect(enabled(restored, RAIDERS_ONLY_RULE)).false;
+    expect(enabled(restored, CIV1_LAND_UPRISING)).false;
+    expect(enabled(restored, LAND_UPRISING_RULE)).true;
     expect(restored.ruleSets.validate()).to.eql([]);
   });
 
-  it('should keep the parent switched off through a save, as the two sets that start on switched off', (): void => {
+  it('should keep the parent switched off through a save, as the sets that start on switched off', (): void => {
     const game = loadGame();
 
     game.ruleSets.set(ENHANCED, false);
@@ -194,12 +279,18 @@ describe('registerRules', (): void => {
     expect(choices).to.eql([
       { id: BARBARIAN_LEADER_RANSOM, value: false },
       { id: OBSOLETE_BUILDS, value: false },
+      { id: CAPTURED_CITY_BUILD, value: false },
+      { id: POLLUTION_IN_EVERY_CITY, value: false },
+      { id: BARBARIAN_CITY_BUILDS, value: false },
+      { id: BARBARIAN_UPRISINGS, value: false },
     ]);
     expect(restored.ruleSets.restore(choices)).to.eql([]);
     expect(restored.ruleSets.state(ENHANCED)).to.equal('off');
-    expect(enabled(restored, CIV1_RANSOM)).true;
-    expect(enabled(restored, RANSOM_RULE)).false;
     expect(enabled(restored, REVALIDATE_BUILDS_RULE)).false;
+    replacements.forEach(([, civ1Rule, rule]): void => {
+      expect(enabled(restored, civ1Rule), civ1Rule).true;
+      expect(enabled(restored, rule), rule).false;
+    });
   });
 
   describe('the order packages load in', (): void => {
@@ -231,6 +322,7 @@ describe('registerRules', (): void => {
     it("should be by name, the plugin loader's, in these tests", (): void => {
       expect(pluginOrder).to.eql([
         'civ1-barbarians',
+        'civ1-city',
         'civ1-city-improvement',
         'civ1-enhanced',
         'civ1-unit',

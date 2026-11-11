@@ -1,21 +1,40 @@
 import {
+  BARBARIAN_CITY_BUILDS,
   BARBARIAN_LEADER_RANSOM,
+  BARBARIAN_UPRISINGS,
+  CAPTURED_CITY_BUILD,
   ENHANCED,
   HYDRO_PLANT_SITE,
   OBSOLETE_BUILDS,
+  POLLUTION_IN_EVERY_CITY,
 } from './RuleSets';
 import {
+  CLEAR_CAPTURED_BUILD_RULE,
   HYDRO_PLANT_SITE_RULE,
+  LAND_UPRISING_RULE,
+  POLLUTION_RULE,
+  RAIDERS_ONLY_RULE,
   RANSOM_RULE,
   REVALIDATE_BUILDS_RULE,
 } from './RuleIds';
+import {
+  HYDRO_PLANT_SITE_RULE as CIV1_HYDRO_PLANT_SITE_RULE,
+  POLLUTION_RULE as CIV1_POLLUTION_RULE,
+} from '@civ-clone/civ1-city-improvement/RuleIds';
+import {
+  LAND_UPRISING_RULE as CIV1_LAND_UPRISING_RULE,
+  RAIDERS_ONLY_RULE as CIV1_RAIDERS_ONLY_RULE,
+  RANSOM_RULE as CIV1_RANSOM_RULE,
+} from '@civ-clone/civ1-barbarians/RuleIds';
 import { Game, defaultGame } from '@civ-clone/core-game';
-import { HYDRO_PLANT_SITE_RULE as CIV1_HYDRO_PLANT_SITE_RULE } from '@civ-clone/civ1-city-improvement/RuleIds';
-import { RANSOM_RULE as CIV1_RANSOM_RULE } from '@civ-clone/civ1-barbarians/RuleIds';
+import { KEEP_BUILD_RULE as CIV1_KEEP_BUILD_RULE } from '@civ-clone/civ1-city/RuleIds';
 import RuleSet from '@civ-clone/core-rule/RuleSet';
 import cityBuild from './Rules/City/build';
+import cityCaptured from './Rules/City/captured';
+import cityProcessYield from './Rules/City/processYield';
 import { describedRequirements } from './Requirements';
 import playerResearchComplete from './Rules/Player/researchComplete';
+import turnStart from './Rules/Turn/start';
 import unitDestroyed from './Rules/Unit/destroyed';
 
 export const register = (game: Game): void => {
@@ -39,13 +58,37 @@ export const register = (game: Game): void => {
         RANSOM_RULE
       ),
       // A rule added to Civ1's, so nothing to supersede: switched off, v474.05's play is what is left.
-      new RuleSet(OBSOLETE_BUILDS, REVALIDATE_BUILDS_RULE)
+      new RuleSet(OBSOLETE_BUILDS, REVALIDATE_BUILDS_RULE),
+      // Only the human's capture: v474.05 already has a computer player choose again, as `civ1-city`'s rule does.
+      new RuleSet(
+        CAPTURED_CITY_BUILD,
+        { supersedes: [CIV1_KEEP_BUILD_RULE] },
+        CLEAR_CAPTURED_BUILD_RULE
+      ),
+      new RuleSet(
+        POLLUTION_IN_EVERY_CITY,
+        { supersedes: [CIV1_POLLUTION_RULE] },
+        POLLUTION_RULE
+      ),
+      new RuleSet(
+        BARBARIAN_CITY_BUILDS,
+        { supersedes: [CIV1_RAIDERS_ONLY_RULE] },
+        RAIDERS_ONLY_RULE
+      ),
+      new RuleSet(
+        BARBARIAN_UPRISINGS,
+        { supersedes: [CIV1_LAND_UPRISING_RULE] },
+        LAND_UPRISING_RULE
+      )
     )
   );
 
   game.rules.register(
-    ...cityBuild(),
+    ...cityBuild(game),
+    ...cityCaptured(game),
+    ...cityProcessYield(game),
     ...playerResearchComplete(game.cities, game.cityBuilds),
+    ...turnStart(game),
     ...unitDestroyed(game)
   );
 
