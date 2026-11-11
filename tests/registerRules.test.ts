@@ -25,6 +25,7 @@ import {
   HYDRO_PLANT_SITE_RULE,
   KEEP_VETERAN_RULE,
   LAND_UPRISING_RULE,
+  OBSOLETE_BUILDS_RULES,
   POLLUTION_RULE,
   RAIDERS_ONLY_RULE,
   RANSOM_RULE,
@@ -76,6 +77,19 @@ const variants: [string, string, string][] = [
 
 const enabled = (game: Game, id: string): boolean =>
   game.rules.getById(id)!.enabled();
+
+// Whether every one of `OBSOLETE_BUILDS`' rules is switched on (`true`), every one off (`false`), or some of each.
+const obsoleteBuilds = (game: Game): boolean | 'mixed' => {
+  const states = OBSOLETE_BUILDS_RULES.map((id: string): boolean =>
+    enabled(game, id)
+  );
+
+  return states.every((state) => state)
+    ? true
+    : states.every((state) => !state)
+    ? false
+    : 'mixed';
+};
 
 describe('registerRules', (): void => {
   it('should register against a game', (): void => {
@@ -134,6 +148,21 @@ describe('registerRules', (): void => {
       CIV1_HYDRO_PLANT_SITE,
     ]);
     expect(game.ruleSets.get(OBSOLETE_BUILDS)!.supersedes()).to.eql([]);
+    // The discovery's rule, by the id saves and hosts know it by, then those that act as other things happen
+    //  (civ-clone/web-renderer#965).
+    expect(game.ruleSets.get(OBSOLETE_BUILDS)!.memberIds()).to.eql([
+      REVALIDATE_BUILDS_RULE,
+      'civ1-enhanced:city-improvement/sold/drop-builds-that-needed-it',
+      'civ1-enhanced:unit/city-sabotaged/note-improvements',
+      'civ1-enhanced:unit/city-sabotaged/drop-builds-that-needed-them',
+      'civ1-enhanced:city/process-yield/note-improvements',
+      'civ1-enhanced:city/process-yield/drop-builds-that-needed-them',
+      'civ1-enhanced:city/building-complete/drop-excluded-builds',
+      'civ1-enhanced:city/captured/drop-excluded-builds',
+    ]);
+    OBSOLETE_BUILDS_RULES.forEach((id: string): void => {
+      expect(game.rules.getById(id), id).not.to.be.null;
+    });
     [...replacements, ...variants].forEach(([set, civ1Rule, rule]): void => {
       expect(game.ruleSets.get(set)!.supersedes(), set).to.eql([civ1Rule]);
       expect(game.ruleSets.get(set)!.memberIds(), set).to.eql([rule]);
@@ -149,7 +178,7 @@ describe('registerRules', (): void => {
 
     expect(enabled(game, CIV1_HYDRO_PLANT_SITE)).true;
     expect(enabled(game, HYDRO_PLANT_SITE_RULE)).false;
-    expect(enabled(game, REVALIDATE_BUILDS_RULE)).true;
+    expect(obsoleteBuilds(game)).true;
     replacements.forEach(([set, civ1Rule, rule]): void => {
       expect(game.ruleSets.state(set), set).to.equal('on');
       expect(enabled(game, civ1Rule), civ1Rule).false;
@@ -175,7 +204,7 @@ describe('registerRules', (): void => {
     expect(game.ruleSets.state(ENHANCED)).to.equal('off');
     expect(enabled(game, CIV1_HYDRO_PLANT_SITE)).true;
     expect(enabled(game, HYDRO_PLANT_SITE_RULE)).false;
-    expect(enabled(game, REVALIDATE_BUILDS_RULE)).false;
+    expect(obsoleteBuilds(game)).false;
     [...replacements, ...variants].forEach(([set, civ1Rule, rule]): void => {
       expect(game.ruleSets.state(set), set).to.equal('off');
       expect(enabled(game, civ1Rule), civ1Rule).true;
@@ -192,7 +221,7 @@ describe('registerRules', (): void => {
     expect(game.ruleSets.state(ENHANCED)).to.equal('on');
     expect(enabled(game, CIV1_HYDRO_PLANT_SITE)).false;
     expect(enabled(game, HYDRO_PLANT_SITE_RULE)).true;
-    expect(enabled(game, REVALIDATE_BUILDS_RULE)).true;
+    expect(obsoleteBuilds(game)).true;
     [...replacements, ...variants].forEach(([, civ1Rule, rule]): void => {
       expect(enabled(game, civ1Rule), civ1Rule).false;
       expect(enabled(game, rule), rule).true;
@@ -328,7 +357,7 @@ describe('registerRules', (): void => {
     expect(enabled(restored, HYDRO_PLANT_SITE_RULE)).true;
     expect(enabled(restored, CIV1_RANSOM)).true;
     expect(enabled(restored, RANSOM_RULE)).false;
-    expect(enabled(restored, REVALIDATE_BUILDS_RULE)).false;
+    expect(obsoleteBuilds(restored)).false;
     expect(enabled(restored, CIV1_KEEP_BUILD)).true;
     expect(enabled(restored, CLEAR_CAPTURED_BUILD_RULE)).false;
     expect(enabled(restored, CIV1_POLLUTION)).false;
@@ -373,7 +402,7 @@ describe('registerRules', (): void => {
     ]);
     expect(restored.ruleSets.restore(choices)).to.eql([]);
     expect(restored.ruleSets.state(ENHANCED)).to.equal('off');
-    expect(enabled(restored, REVALIDATE_BUILDS_RULE)).false;
+    expect(obsoleteBuilds(restored)).false;
     [...replacements, ...variants].forEach(([, civ1Rule, rule]): void => {
       expect(enabled(restored, civ1Rule), civ1Rule).true;
       expect(enabled(restored, rule), rule).false;

@@ -38,10 +38,22 @@ switching those sets off there means no pollution and no uprisings at all, and t
   in a stack that another unit defended too (civ-clone/web-renderer#171), through `civ1-barbarians`' `lib/ransom`, so
   `barbarians:ransom` is emitted as before. Supersedes `civ1-barbarians:unit/defeated/ransom`, which, as v474.05, pays
   only for a leader who defends and loses.
-- `civ1-enhanced:obsolete-builds` (`OBSOLETE_BUILDS`), on to start with:
-  `civ1-enhanced:player/research-complete/revalidate-builds` drops what a city is building once a discovery makes it
-  obsolete, as Gunpowder does Spearman, and its player chooses again (civ-clone/web-renderer#693). A rule added to
-  Civ1's, so it supersedes nothing: switched off, a city finishes the build, as v474.05's does.
+- `civ1-enhanced:obsolete-builds` (`OBSOLETE_BUILDS`), on to start with: a city stops building what it can no longer
+  build, as that happens, and its player chooses again (civ-clone/web-renderer#693, #965). Rules added to Civ1's, so
+  it supersedes nothing: switched off, a city finishes the build, as v474.05's does. Each drops a build only for its
+  own reason, read from the game's `requirements` (a build whose refusals include the id of an entry naming what
+  happened), so a plugin's entries count and a build refused for any other reason, such as one a city kept when the
+  human captured it, is left:
+  - `civ1-enhanced:player/research-complete/revalidate-builds`: a discovery that makes the build obsolete (an
+    `obsoletedBy` entry naming the advance), as Gunpowder does Spearman.
+  - `civ1-enhanced:city-improvement/sold/drop-builds-that-needed-it`, `…:unit/city-sabotaged/…` and
+    `…:city/process-yield/…`: the city loses an improvement the build needs (a `requires` entry naming it), sold,
+    sabotaged or not paid for. The `…/note-improvements` rules note what a city has at `High`, and the
+    `…/drop-builds-that-needed-them` rules compare at `Low`. A city destroyed, however it happens, drops nothing, and a
+    Wonder is never counted as lost: one lost with its city was still built, as v474.05 has it.
+  - `civ1-enhanced:city/building-complete/drop-excluded-builds` and `…:city/captured/drop-excluded-builds`: the player
+    completes, or takes a city with, something that excludes the build (an `excludedBy` entry naming it, such as
+    `civ1-wonder`'s Hoover Dam entries for the plants). The captured city's own build is `CAPTURED_CITY_BUILD`'s.
 - `civ1-enhanced:captured-city-build` (`CAPTURED_CITY_BUILD`), on to start with:
   `civ1-enhanced:city/captured/clear-build` clears what a city the human captures was building, so the human chooses
   at their own price (civ-clone/web-renderer#670, #500), through `civ1-city`'s `lib/capturedBuild`. Supersedes

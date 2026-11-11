@@ -9,7 +9,7 @@ import registerEnhanced from '../../registerRules';
 import registerUnit from '@civ-clone/civ1-unit/registerRules';
 import registerWonder from '@civ-clone/civ1-wonder/registerRules';
 
-/** The Civ1 packages whose rules this one's sets change. */
+/** The Civ1 packages whose rules this one's sets change, or whose entries they read. */
 export type Civ1Package =
   | 'civ1-barbarians'
   | 'civ1-city'
