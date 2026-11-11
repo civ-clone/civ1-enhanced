@@ -13,6 +13,13 @@ which `validate()` shows and does not block on.
 The ids it supersedes are imported from each Civ1 package's `RuleIds`, so a rule renamed there breaks this package's
 build rather than leaving both rules running. Its own rule ids are exported the same way, from `RuleIds.ts`.
 
+## Additional civilizations
+
+Loading this package also loads the twelve civilizations the original does not have (Sioux, Inca, Brazilian, Malian,
+Kongo, Ethiopian, Viking, Khmer, Indonesian, Japanese, Australian and Chukchi), with their leaders, traits, national
+themes and Earth start tiles. They are provided by `@civ-clone/civ1-world-civilizations`, which this package depends
+on and imports for its side effect, so a game with `civ1-enhanced` has them and one without does not.
+
 ## Rule sets
 
 Where a rule below says "the human", that is every player whose seat is not played by the computer (`civ1-difficulty`'s
