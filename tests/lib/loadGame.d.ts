@@ -1,6 +1,6 @@
 import { Game, GameSlots } from '@civ-clone/core-game/Game';
 import World from '@civ-clone/core-world/World';
-/** The Civ1 packages whose rules this one's sets change. */
+/** The Civ1 packages whose rules this one's sets change, or whose entries they read. */
 export type Civ1Package =
   | 'civ1-barbarians'
   | 'civ1-city'

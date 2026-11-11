@@ -15,7 +15,12 @@ exports.HYDRO_PLANT_SITE = 'civ1-enhanced:hydro-plant-site';
  * `civ1-barbarians`' ransom rule while it is on.
  */
 exports.BARBARIAN_LEADER_RANSOM = 'civ1-enhanced:barbarian-leader-ransom';
-/** A discovery that makes what a city is building obsolete drops the build, and its player chooses again. */
+/**
+ * A city stops building what it can no longer build, and its player chooses again, as it happens: when a discovery
+ * makes the item obsolete, when the city loses an improvement the item needs, or when its player gains something that
+ * excludes it (the Hoover Dam, plants). Switched off, the city finishes it, as v474.05's does (civ-clone/web-renderer#693,
+ * #965).
+ */
 exports.OBSOLETE_BUILDS = 'civ1-enhanced:obsolete-builds';
 /**
  * A city the human captures stops building what it was, and the human chooses, as a computer player's capture does

@@ -16,6 +16,8 @@ import Client from '@civ-clone/core-client/Client';
 import Criterion from '@civ-clone/core-rule/Criterion';
 import Effect from '@civ-clone/core-rule/Effect';
 import BronzeWorking from '@civ-clone/base-science-advance-bronzeworking/BronzeWorking';
+import Chivalry from '@civ-clone/base-science-advance-chivalry/Chivalry';
+import Explosives from '@civ-clone/base-science-advance-explosives/Explosives';
 import { Game } from '@civ-clone/core-game/Game';
 import Gunpowder from '@civ-clone/base-science-advance-gunpowder/Gunpowder';
 import High from '@civ-clone/core-rule/Priorities/High';
@@ -240,25 +242,27 @@ describe("a captured city's build (civ-clone/web-renderer#954)", (): void => {
     });
   });
 
-  // With v474.05's capture and civ-clone's obsolete builds, its default: `OBSOLETE_BUILDS`' rule drops a build the
-  //  player cannot choose at any discovery, not only one the discovery made obsolete (civ-clone/web-renderer#954). These
-  //  record that, for a city the human captures building Spearman: what the human may build decides whether an
-  //  unrelated discovery drops it.
-  describe("a kept build, at the human's next discovery, with only CAPTURED_CITY_BUILD switched off", (): void => {
-    // A computer player's city building Spearman, which needs Bronze Working, taken by the human, who knows `known`.
+  // With v474.05's capture and civ-clone's obsolete builds, its default: `OBSOLETE_BUILDS`' discovery rule drops only
+  //  what a discovery makes obsolete, so the two sets are independent (civ-clone/web-renderer#965). It used to drop a
+  //  build the player could not choose at any discovery, which took a kept item the human could not build at their
+  //  next one, often the advance taken with the city. These are for a city the human captures building Spearman.
+  describe("a kept build, at the human's later discoveries, with only CAPTURED_CITY_BUILD switched off", (): void => {
+    // A computer player's city building Spearman, which needs Bronze Working, taken by the human, who knows `known`,
+    //  in a game with a third player and civ1-wonder's `world` obsolescence entries (the Great Wall's names Gunpowder).
     const captureSpearman = async (
       known: (typeof BronzeWorking)[],
       sets: [string, boolean][]
     ) => {
-      const game: Game = loadGame(['civ1-city', 'civ1-unit']),
+      const game: Game = loadGame(['civ1-city', 'civ1-unit', 'civ1-wonder']),
         world = await buildWorld(game),
         owner = new Player(game.rules),
         human = new Player(game.rules),
+        third = new Player(game.rules),
         research = new Map<Player, PlayerResearch>();
 
       sets.forEach((set): void => game.ruleSets.set(...set));
 
-      [owner, human].forEach((player: Player): void => {
+      [owner, human, third].forEach((player: Player): void => {
         const playerResearch = new PlayerResearch(
           player,
           new AdvanceRegistry(),
@@ -273,7 +277,11 @@ describe("a captured city's build (civ-clone/web-renderer#954)", (): void => {
         game.playerResearch.register(playerResearch);
         research.set(player, playerResearch);
       });
-      game.clients.register(new AIClient(owner), new Client(human));
+      game.clients.register(
+        new AIClient(owner),
+        new Client(human),
+        new AIClient(third)
+      );
       research.get(owner)!.addAdvance(BronzeWorking);
       known.forEach((Advance) => research.get(human)!.addAdvance(Advance));
       game.availableCityBuildItems.register(
@@ -290,9 +298,14 @@ describe("a captured city's build (civ-clone/web-renderer#954)", (): void => {
 
       expect(cityBuild.building()!.item()).to.equal(Spearman);
 
+      const discovers = (player: Player) =>
+        research.get(player)!.addAdvance.bind(research.get(player)!);
+
       return {
         cityBuild,
-        discover: research.get(human)!.addAdvance.bind(research.get(human)!),
+        discover: discovers(human),
+        ownerDiscovers: discovers(owner),
+        thirdDiscovers: discovers(third),
       };
     };
 
@@ -315,19 +328,57 @@ describe("a captured city's build (civ-clone/web-renderer#954)", (): void => {
       });
     });
 
-    it("should drop a Spearman the human can't build at an unrelated discovery", async (): Promise<void> => {
-      const { cityBuild, discover } = await captureSpearman(
-        [],
-        [[CAPTURED_CITY_BUILD, false]]
-      );
+    // It was dropped at Writing, as the human can't build it without Bronze Working.
+    it("should keep a Spearman the human can't build through every discovery that does not make it obsolete for them, and drop it at their Gunpowder", async (): Promise<void> => {
+      const { cityBuild, discover, ownerDiscovers, thirdDiscovers } =
+        await captureSpearman([], [[CAPTURED_CITY_BUILD, false]]);
 
       discover(Writing);
+      discover(Chivalry);
+      thirdDiscovers(Gunpowder);
+      ownerDiscovers(Gunpowder);
+
+      expect(cityBuild.building()!.item()).to.equal(Spearman);
+      expect(cityBuild.cleared()).null;
+
+      discover(Gunpowder);
 
       expect(cityBuild.building()).null;
       expect(cityBuild.cleared()).to.eql({
         reason: 'unavailable',
         item: Spearman,
       });
+    });
+
+    it("should keep a Spearman that was already obsolete for the human through every later discovery, anyone's", async (): Promise<void> => {
+      const { cityBuild, discover, ownerDiscovers, thirdDiscovers } =
+        await captureSpearman(
+          [BronzeWorking, Gunpowder],
+          [[CAPTURED_CITY_BUILD, false]]
+        );
+
+      discover(Writing);
+      discover(Chivalry);
+      discover(Explosives);
+      // Gunpowder also makes the Great Wall obsolete, for everyone: that entry's range is the world's, and it brings
+      //  nothing about a Spearman to the human's cities (civ-clone/web-renderer#965).
+      thirdDiscovers(Gunpowder);
+      ownerDiscovers(Gunpowder);
+
+      expect(cityBuild.building()!.item()).to.equal(Spearman);
+      expect(cityBuild.cleared()).null;
+    });
+
+    it('should keep it with the parent switched off, as v474.05', async (): Promise<void> => {
+      const { cityBuild, discover } = await captureSpearman(
+        [],
+        [[ENHANCED, false]]
+      );
+
+      discover(Writing);
+      discover(Gunpowder);
+
+      expect(cityBuild.building()!.item()).to.equal(Spearman);
     });
 
     it('should keep it through both with OBSOLETE_BUILDS switched off too, as v474.05', async (): Promise<void> => {

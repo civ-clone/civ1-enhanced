@@ -12,10 +12,10 @@ import {
   CLEAR_CAPTURED_BUILD_RULE,
   HYDRO_PLANT_SITE_RULE,
   LAND_UPRISING_RULE,
+  OBSOLETE_BUILDS_RULES,
   POLLUTION_RULE,
   RAIDERS_ONLY_RULE,
   RANSOM_RULE,
-  REVALIDATE_BUILDS_RULE,
 } from './RuleIds';
 import {
   HYDRO_PLANT_SITE_RULE as CIV1_HYDRO_PLANT_SITE_RULE,
@@ -31,6 +31,8 @@ import { KEEP_BUILD_RULE as CIV1_KEEP_BUILD_RULE } from '@civ-clone/civ1-city/Ru
 import RuleSet from '@civ-clone/core-rule/RuleSet';
 import cityBuild from './Rules/City/build';
 import cityCaptured from './Rules/City/captured';
+import cityGainedImprovements from './Rules/City/gainedImprovements';
+import cityLostImprovements from './Rules/City/lostImprovements';
 import cityProcessYield from './Rules/City/processYield';
 import { describedRequirements } from './Requirements';
 import playerResearchComplete from './Rules/Player/researchComplete';
@@ -85,8 +87,8 @@ export const register = (game: Game): void => {
         { supersedes: [CIV1_RANSOM_RULE] },
         RANSOM_RULE
       ),
-      // A rule added to Civ1's, so nothing to supersede: switched off, v474.05's play is what is left.
-      new RuleSet(OBSOLETE_BUILDS, REVALIDATE_BUILDS_RULE),
+      // Rules added to Civ1's, so nothing to supersede: switched off, v474.05's play is what is left.
+      new RuleSet(OBSOLETE_BUILDS, ...OBSOLETE_BUILDS_RULES),
       // Only the human's capture: v474.05 already has a computer player choose again, as `civ1-city`'s rule does.
       new RuleSet(
         CAPTURED_CITY_BUILD,
@@ -144,7 +146,7 @@ export const register = (game: Game): void => {
     ...cityBuild(game),
     ...cityCaptured(game),
     ...cityProcessYield(game),
-    ...playerResearchComplete(game.cities, game.cityBuilds),
+    ...playerResearchComplete(game),
     ...turnStart(game),
     ...unitDestroyed(game),
     // civ-clone/web-renderer#960
@@ -153,7 +155,10 @@ export const register = (game: Game): void => {
     ...unitDetonated(game),
     ...unitTransferred(game),
     // civ-clone/web-renderer#959
-    ...cityHold(game)
+    ...cityHold(game),
+    // What a city can no longer build for other reasons than a discovery: as it happens (civ-clone/web-renderer#965).
+    ...cityLostImprovements(game),
+    ...cityGainedImprovements(game)
   );
 
   // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the

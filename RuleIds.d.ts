@@ -6,6 +6,29 @@ export declare const RANSOM_RULE = 'civ1-enhanced:unit/destroyed/ransom';
 /** A discovery that makes what a city is building obsolete drops the build. */
 export declare const REVALIDATE_BUILDS_RULE =
   'civ1-enhanced:player/research-complete/revalidate-builds';
+/** Selling an improvement drops a build in its city that needed it. */
+export declare const DROP_BUILDS_NEEDING_SOLD_RULE =
+  'civ1-enhanced:city-improvement/sold/drop-builds-that-needed-it';
+/** Notes what a city has before it is sabotaged, for `DROP_BUILDS_NEEDING_SABOTAGED_RULE`. */
+export declare const NOTE_SABOTAGED_RULE =
+  'civ1-enhanced:unit/city-sabotaged/note-improvements';
+/** An improvement sabotaged drops a build in its city that needed it. */
+export declare const DROP_BUILDS_NEEDING_SABOTAGED_RULE =
+  'civ1-enhanced:unit/city-sabotaged/drop-builds-that-needed-them';
+/** Notes what a city has before its yields are processed, for `DROP_BUILDS_NEEDING_UNSUPPORTED_RULE`. */
+export declare const NOTE_UNSUPPORTED_RULE =
+  'civ1-enhanced:city/process-yield/note-improvements';
+/** An improvement lost as its city's yields are processed (its upkeep unpaid) drops a build that needed it. */
+export declare const DROP_BUILDS_NEEDING_UNSUPPORTED_RULE =
+  'civ1-enhanced:city/process-yield/drop-builds-that-needed-them';
+/** Completing something drops the player's builds it now excludes, as the Hoover Dam does plants. */
+export declare const DROP_EXCLUDED_BUILDS_COMPLETE_RULE =
+  'civ1-enhanced:city/building-complete/drop-excluded-builds';
+/** Capturing a city drops the captor's builds that what it holds now excludes, as the Hoover Dam does plants. */
+export declare const DROP_EXCLUDED_BUILDS_CAPTURED_RULE =
+  'civ1-enhanced:city/captured/drop-excluded-builds';
+/** Every rule of `OBSOLETE_BUILDS`, in the order they are registered. */
+export declare const OBSOLETE_BUILDS_RULES: string[];
 /** A city the human captures stops building what it was, and the human chooses. */
 export declare const CLEAR_CAPTURED_BUILD_RULE =
   'civ1-enhanced:city/captured/clear-build';
