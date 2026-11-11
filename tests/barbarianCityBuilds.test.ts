@@ -124,6 +124,17 @@ describe('what a barbarian city builds (civ-clone/web-renderer#954)', (): void =
         expect(available(Knight), 'Knight: one civilization').to.be.false;
         expect(available(class Granary {}), 'an improvement').to.be.false;
 
+        // The barbarians themselves are not one of the two.
+        const barbarians = {
+          civilization: () => new Barbarian(),
+        } as unknown as Player;
+
+        research.set(barbarians, [Chivalry]);
+
+        expect(available(Knight), 'Knight: one civilization and the barbarians')
+          .to.be.false;
+
+        research.delete(barbarians);
         research.set(b, [Chivalry]);
 
         expect(available(Knight), 'Knight: two civilizations').to.be.true;

@@ -15,6 +15,11 @@ build rather than leaving both rules running. Its own rule ids are exported the 
 
 ## Rule sets
 
+Where a rule below says "the human", that is every player whose seat is not played by the computer (`civ1-difficulty`'s
+`isHuman`: a player with a client, none of them an `AIClient`), each counting as v474.05's one human. In a game with
+no such seat (all computer players, or a game only watched), the v474.05 pollution and uprising rules never fire, so
+switching those sets off there means no pollution and no uprisings at all.
+
 - `civ1-enhanced:hydro-plant-site` (`HYDRO_PLANT_SITE`), off to start with: `civ1-enhanced:city/build/hydro-plant-site`
   lets a city build a Hydro Plant with Mountains or a River on its own square as well as next to it, as the manual's
   "on or near" has it. Supersedes `civ1-city-improvement:city/build/hydro-plant-site`, which, as v474.05, looks only
