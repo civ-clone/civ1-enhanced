@@ -1,8 +1,9 @@
 # civ1-enhanced
 
-Rules that change Civilization I's, each in a rule set a new game can switch (civ-clone/web-renderer#954). The
-`civ1-*` packages play as v474.05 does; this one holds the departures from it, so that a game without it loaded, or
-with its sets switched off, is v474.05.
+Rules that change Civilization I's, each in a rule set a new game can switch (civ-clone/web-renderer#954). For the
+rules below, the `civ1-*` packages play as v474.05 does and this one holds the departures from it, so that a game
+without it loaded, or with its sets switched off, plays them as v474.05. Other departures from v474.05 are still inside
+the `civ1-*` packages (see the survey on civ-clone/web-renderer#954), and move here one at a time.
 
 Every set is beneath `civ1-enhanced` (`RuleSets.ENHANCED`), which a setup window can draw as one three-state checkbox.
 A set that `supersedes` a Civ1 rule takes its place while the set is on, and gives it back when switched off, without

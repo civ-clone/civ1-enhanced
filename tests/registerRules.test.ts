@@ -7,7 +7,7 @@ import {
 // The Civ1 rules this package's sets change, and the rules they change them with (civ-clone/web-renderer#954).
 import { Game } from '@civ-clone/core-game/Game';
 import { expect } from 'chai';
-import loadGame from './lib/loadGame';
+import loadGame, { Package, pluginOrder } from './lib/loadGame';
 import register from '../registerRules';
 
 import {
@@ -182,7 +182,7 @@ describe('registerRules', (): void => {
     expect(restored.ruleSets.validate()).to.eql([]);
   });
 
-  it('should keep the parent switched off as one line through a save', (): void => {
+  it('should keep the parent switched off through a save, as the two sets that start on switched off', (): void => {
     const game = loadGame();
 
     game.ruleSets.set(ENHANCED, false);
@@ -190,9 +190,69 @@ describe('registerRules', (): void => {
     const choices = game.ruleSets.choices(),
       restored = loadGame();
 
+    // The Hydro Plant's set already starts off, so the parent switched off differs from the defaults in the other two.
+    expect(choices).to.eql([
+      { id: BARBARIAN_LEADER_RANSOM, value: false },
+      { id: OBSOLETE_BUILDS, value: false },
+    ]);
     expect(restored.ruleSets.restore(choices)).to.eql([]);
     expect(restored.ruleSets.state(ENHANCED)).to.equal('off');
     expect(enabled(restored, CIV1_RANSOM)).true;
     expect(enabled(restored, RANSOM_RULE)).false;
+    expect(enabled(restored, REVALIDATE_BUILDS_RULE)).false;
+  });
+
+  describe('the order packages load in', (): void => {
+    // Every rule with an id, and whether it is switched on.
+    const running = (game: Game): [string, boolean][] =>
+      game.rules
+        .entries()
+        .filter((rule) => rule.id() !== null)
+        .map((rule): [string, boolean] => [rule.id()!, rule.enabled()])
+        .sort(([a], [b]) => a.localeCompare(b));
+
+    const orders: [string, Package[]][] = [
+      [
+        'civ1-enhanced first',
+        [
+          'civ1-enhanced',
+          ...pluginOrder.filter((name) => name !== 'civ1-enhanced'),
+        ],
+      ],
+      [
+        'civ1-enhanced last',
+        [
+          ...pluginOrder.filter((name) => name !== 'civ1-enhanced'),
+          'civ1-enhanced',
+        ],
+      ],
+    ];
+
+    it("should be by name, the plugin loader's, in these tests", (): void => {
+      expect(pluginOrder).to.eql([
+        'civ1-barbarians',
+        'civ1-city-improvement',
+        'civ1-enhanced',
+        'civ1-unit',
+      ]);
+    });
+
+    orders.forEach(([name, order]): void => {
+      it(`should leave the same rules running with ${name}, by default and with every set switched`, (): void => {
+        const byName = loadGame(),
+          other = loadGame(undefined, order);
+
+        expect(running(other)).to.eql(running(byName));
+
+        [true, false].forEach((on: boolean): void => {
+          byName.ruleSets.set(ENHANCED, on);
+          other.ruleSets.set(ENHANCED, on);
+
+          expect(running(other)).to.eql(running(byName));
+        });
+
+        expect(other.ruleSets.validate()).to.eql([]);
+      });
+    });
   });
 });

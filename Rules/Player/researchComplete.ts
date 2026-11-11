@@ -23,6 +23,8 @@ export const getRules: (
     // A discovery can make what a city is building obsolete, as Gunpowder does Spearman: the city stops and its player
     //  chooses again (civ-clone/web-renderer#693). v474.05 goes on building it, as a game does with `OBSOLETE_BUILDS`
     //  off (civ-clone/web-renderer#954).
+    //  In plugin order this package loads before civ1-science, so the build is dropped before `player:research-complete`
+    //  is raised rather than after, as it was from civ1-unit: the end state is the same.
     REVALIDATE_BUILDS_RULE,
     new Effect((playerResearch: PlayerResearch): void =>
       cityRegistry

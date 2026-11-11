@@ -21,7 +21,6 @@
     "@civ-clone/base-science-advance-bronzeworking": "^0.1.0",
     "@civ-clone/base-science-advance-gunpowder": "^0.1.0",
     "@civ-clone/base-science-advance-writing": "^0.1.0",
-    "@civ-clone/core-civilization": "^0.1.8",
     "@civ-clone/core-treasury": "^0.1.9",
     "@civ-clone/simple-world-generator": "^0.1.6",
     "@types/chai": "^4.0.0",

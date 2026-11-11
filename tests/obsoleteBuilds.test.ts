@@ -15,9 +15,9 @@ import { Production } from '@civ-clone/civ1-world/Yields';
 import Writing from '@civ-clone/base-science-advance-writing/Writing';
 import { expect } from 'chai';
 
-// A city that knows Bronze Working building Spearman, in a game with civ1-unit's rules (Gunpowder makes Spearman
+// A city (or more) of a player who knows Bronze Working, building Spearman, in a game with civ1-unit's rules (Gunpowder makes Spearman
 //  obsolete) and this package's.
-const setUp = async (on?: boolean) => {
+const setUp = async (on?: boolean, cities: number = 1) => {
   const game: Game = loadGame(['civ1-unit']),
     world = await buildWorld(game),
     player = new Player(game.rules),
@@ -38,16 +38,20 @@ const setUp = async (on?: boolean) => {
     ...([Spearman, Musketman] as unknown as (typeof Buildable)[])
   );
 
-  const city = new City(player, world.get(2, 2), 'Test', game.rules),
-    cityBuild = new CityBuild(city, availableItems, game.rules);
+  const cityBuilds = Array.from({ length: cities }, (_, x: number) => {
+    const city = new City(player, world.get(x * 2, 2), 'Test', game.rules),
+      cityBuild = new CityBuild(city, availableItems, game.rules);
 
-  game.cities.register(city);
-  game.cityBuilds.register(cityBuild);
+    game.cities.register(city);
+    game.cityBuilds.register(cityBuild);
 
-  cityBuild.build(Spearman as unknown as typeof Buildable);
-  cityBuild.add(new Production(5));
+    cityBuild.build(Spearman as unknown as typeof Buildable);
+    cityBuild.add(new Production(5));
 
-  return { cityBuild, playerResearch };
+    return cityBuild;
+  });
+
+  return { cityBuild: cityBuilds[0], cityBuilds, playerResearch };
 };
 
 describe('a build a discovery makes obsolete (civ-clone/web-renderer#954)', (): void => {
@@ -68,6 +72,20 @@ describe('a build a discovery makes obsolete (civ-clone/web-renderer#954)', (): 
       expect(cityBuild.cleared()).to.eql({
         reason: 'unavailable',
         item: Spearman,
+      });
+    });
+
+    it("should drop it in every one of the player's cities", async (): Promise<void> => {
+      const { cityBuilds, playerResearch } = await setUp(undefined, 2);
+
+      playerResearch.addAdvance(Gunpowder);
+
+      cityBuilds.forEach((cityBuild: CityBuild): void => {
+        expect(cityBuild.building()).null;
+        expect(cityBuild.cleared()).to.eql({
+          reason: 'unavailable',
+          item: Spearman,
+        });
       });
     });
 
