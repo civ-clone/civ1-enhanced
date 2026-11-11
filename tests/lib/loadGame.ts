@@ -7,13 +7,15 @@ import registerCity from '@civ-clone/civ1-city/registerRules';
 import registerCityImprovement from '@civ-clone/civ1-city-improvement/registerRules';
 import registerEnhanced from '../../registerRules';
 import registerUnit from '@civ-clone/civ1-unit/registerRules';
+import registerWonder from '@civ-clone/civ1-wonder/registerRules';
 
 /** The Civ1 packages whose rules this one's sets change. */
 export type Civ1Package =
   | 'civ1-barbarians'
   | 'civ1-city'
   | 'civ1-city-improvement'
-  | 'civ1-unit';
+  | 'civ1-unit'
+  | 'civ1-wonder';
 
 export type Package = Civ1Package | 'civ1-enhanced';
 
@@ -23,6 +25,7 @@ const registers: { [name in Package]: (game: Game) => void } = {
   'civ1-city-improvement': registerCityImprovement,
   'civ1-enhanced': registerEnhanced,
   'civ1-unit': registerUnit,
+  'civ1-wonder': registerWonder,
 };
 
 /** The order the plugin loader registers packages in: by name. */
@@ -36,6 +39,7 @@ export const civ1Packages: Civ1Package[] = [
   'civ1-city',
   'civ1-city-improvement',
   'civ1-unit',
+  'civ1-wonder',
 ];
 
 /**

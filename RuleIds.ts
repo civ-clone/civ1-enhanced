@@ -24,3 +24,16 @@ export const RAIDERS_ONLY_RULE = 'civ1-enhanced:city/build/raiders-only';
 
 /** Each turn any civilization's city may see an uprising of barbarians nearby. */
 export const LAND_UPRISING_RULE = 'civ1-enhanced:turn/start/land-uprising';
+
+/** Every other leader is pacified towards the owner of the United Nations, a computer player's too. */
+export const UNITED_NATIONS_PACIFIED_RULE =
+  'civ1-enhanced:player/pacified/united-nations';
+
+/** A Diplomat takes any advance it can, each as likely as the next. */
+export const STEAL_RULE = 'civ1-enhanced:unit/technology-stolen/steal';
+
+/** Every city near a nuclear detonation loses half its size, but one with SDI Defense. */
+export const HALVE_CITIES_RULE = 'civ1-enhanced:unit/detonated/halve-cities';
+
+/** A unit that changes sides keeps its veteran status, and otherwise arrives as a new unit would. */
+export const KEEP_VETERAN_RULE = 'civ1-enhanced:unit/transferred/keep-veteran';

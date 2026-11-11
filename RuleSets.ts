@@ -42,3 +42,30 @@ export const BARBARIAN_CITY_BUILDS = 'civ1-enhanced:barbarian-city-builds';
  * place of `civ1-barbarians`' uprising rule while it is on.
  */
 export const BARBARIAN_UPRISINGS = 'civ1-enhanced:barbarian-uprisings';
+
+/**
+ * The United Nations pacifies every other leader towards its owner, a computer player's too, so computer players don't
+ * go to war with its owner either (civ-clone/web-renderer#30). Takes the place of `civ1-wonder`'s United Nations rule
+ * while it is on.
+ */
+export const UNITED_NATIONS_STOPS_COMPUTER_WARS =
+  'civ1-enhanced:united-nations-stops-computer-wars';
+
+/**
+ * A Diplomat takes any advance it can, each as likely as the next (civ-clone/web-renderer#58). Takes the place of
+ * `civ1-unit`'s steal rule while it is on.
+ */
+export const EVEN_ADVANCE_STEALING = 'civ1-enhanced:even-advance-stealing';
+
+/**
+ * A city with SDI Defense keeps its size under a nuclear attack, as well as its units (civ-clone/web-renderer#129).
+ * Takes the place of `civ1-unit`'s rule that halves the cities while it is on. Off to start with.
+ */
+export const SDI_DEFENSE_SPARES_CITIES =
+  'civ1-enhanced:sdi-defense-spares-cities';
+
+/**
+ * A unit that changes sides keeps its veteran status. Takes the place of `civ1-unit`'s rule that starts it afresh
+ * while it is on. Off to start with.
+ */
+export const DEFECTORS_STAY_VETERAN = 'civ1-enhanced:defectors-stay-veteran';

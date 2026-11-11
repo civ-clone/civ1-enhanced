@@ -36,6 +36,29 @@ import { describedRequirements } from './Requirements';
 import playerResearchComplete from './Rules/Player/researchComplete';
 import turnStart from './Rules/Turn/start';
 import unitDestroyed from './Rules/Unit/destroyed';
+// civ-clone/web-renderer#960
+import {
+  DEFECTORS_STAY_VETERAN,
+  EVEN_ADVANCE_STEALING,
+  SDI_DEFENSE_SPARES_CITIES,
+  UNITED_NATIONS_STOPS_COMPUTER_WARS,
+} from './RuleSets';
+import {
+  HALVE_CITIES_RULE,
+  KEEP_VETERAN_RULE,
+  STEAL_RULE,
+  UNITED_NATIONS_PACIFIED_RULE,
+} from './RuleIds';
+import {
+  HALVE_CITIES_RULE as CIV1_HALVE_CITIES_RULE,
+  START_AFRESH_RULE as CIV1_START_AFRESH_RULE,
+  STEAL_RULE as CIV1_STEAL_RULE,
+} from '@civ-clone/civ1-unit/RuleIds';
+import { UNITED_NATIONS_PACIFIED_RULE as CIV1_UNITED_NATIONS_PACIFIED_RULE } from '@civ-clone/civ1-wonder/RuleIds';
+import playerPacified from './Rules/Player/pacified';
+import unitDetonated from './Rules/Unit/detonated';
+import unitTechnologyStolen from './Rules/Unit/technologyStolen';
+import unitTransferred from './Rules/Unit/transferred';
 
 export const register = (game: Game): void => {
   // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
@@ -79,6 +102,27 @@ export const register = (game: Game): void => {
         BARBARIAN_UPRISINGS,
         { supersedes: [CIV1_LAND_UPRISING_RULE] },
         LAND_UPRISING_RULE
+      ),
+      // civ-clone/web-renderer#960: two as play was, and two new, off to start with.
+      new RuleSet(
+        UNITED_NATIONS_STOPS_COMPUTER_WARS,
+        { supersedes: [CIV1_UNITED_NATIONS_PACIFIED_RULE] },
+        UNITED_NATIONS_PACIFIED_RULE
+      ),
+      new RuleSet(
+        EVEN_ADVANCE_STEALING,
+        { supersedes: [CIV1_STEAL_RULE] },
+        STEAL_RULE
+      ),
+      new RuleSet(
+        SDI_DEFENSE_SPARES_CITIES,
+        { enabled: false, supersedes: [CIV1_HALVE_CITIES_RULE] },
+        HALVE_CITIES_RULE
+      ),
+      new RuleSet(
+        DEFECTORS_STAY_VETERAN,
+        { enabled: false, supersedes: [CIV1_START_AFRESH_RULE] },
+        KEEP_VETERAN_RULE
       )
     )
   );
@@ -89,7 +133,12 @@ export const register = (game: Game): void => {
     ...cityProcessYield(game),
     ...playerResearchComplete(game.cities, game.cityBuilds),
     ...turnStart(game),
-    ...unitDestroyed(game)
+    ...unitDestroyed(game),
+    // civ-clone/web-renderer#960
+    ...playerPacified(game),
+    ...unitTechnologyStolen(game),
+    ...unitDetonated(game),
+    ...unitTransferred(game)
   );
 
   // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the

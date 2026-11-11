@@ -2,7 +2,7 @@
 // The ids of the rule sets this package registers (civ-clone/web-renderer#954), for whatever switches them. Each is a
 //  departure from v474.05, and all are beneath `ENHANCED`, so a game can switch them as one.
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BARBARIAN_UPRISINGS = exports.BARBARIAN_CITY_BUILDS = exports.POLLUTION_IN_EVERY_CITY = exports.CAPTURED_CITY_BUILD = exports.OBSOLETE_BUILDS = exports.BARBARIAN_LEADER_RANSOM = exports.HYDRO_PLANT_SITE = exports.ENHANCED = void 0;
+exports.DEFECTORS_STAY_VETERAN = exports.SDI_DEFENSE_SPARES_CITIES = exports.EVEN_ADVANCE_STEALING = exports.UNITED_NATIONS_STOPS_COMPUTER_WARS = exports.BARBARIAN_UPRISINGS = exports.BARBARIAN_CITY_BUILDS = exports.POLLUTION_IN_EVERY_CITY = exports.CAPTURED_CITY_BUILD = exports.OBSOLETE_BUILDS = exports.BARBARIAN_LEADER_RANSOM = exports.HYDRO_PLANT_SITE = exports.ENHANCED = void 0;
 /** Every rule set of this package. */
 exports.ENHANCED = 'civ1-enhanced';
 /**
@@ -37,4 +37,25 @@ exports.BARBARIAN_CITY_BUILDS = 'civ1-enhanced:barbarian-city-builds';
  * place of `civ1-barbarians`' uprising rule while it is on.
  */
 exports.BARBARIAN_UPRISINGS = 'civ1-enhanced:barbarian-uprisings';
+/**
+ * The United Nations pacifies every other leader towards its owner, a computer player's too, so computer players don't
+ * go to war with its owner either (civ-clone/web-renderer#30). Takes the place of `civ1-wonder`'s United Nations rule
+ * while it is on.
+ */
+exports.UNITED_NATIONS_STOPS_COMPUTER_WARS = 'civ1-enhanced:united-nations-stops-computer-wars';
+/**
+ * A Diplomat takes any advance it can, each as likely as the next (civ-clone/web-renderer#58). Takes the place of
+ * `civ1-unit`'s steal rule while it is on.
+ */
+exports.EVEN_ADVANCE_STEALING = 'civ1-enhanced:even-advance-stealing';
+/**
+ * A city with SDI Defense keeps its size under a nuclear attack, as well as its units (civ-clone/web-renderer#129).
+ * Takes the place of `civ1-unit`'s rule that halves the cities while it is on. Off to start with.
+ */
+exports.SDI_DEFENSE_SPARES_CITIES = 'civ1-enhanced:sdi-defense-spares-cities';
+/**
+ * A unit that changes sides keeps its veteran status. Takes the place of `civ1-unit`'s rule that starts it afresh
+ * while it is on. Off to start with.
+ */
+exports.DEFECTORS_STAY_VETERAN = 'civ1-enhanced:defectors-stay-veteran';
 //# sourceMappingURL=RuleSets.js.map
