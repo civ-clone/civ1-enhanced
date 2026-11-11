@@ -29,7 +29,11 @@
     "@civ-clone/core-client": "^0.1.0",
     "@civ-clone/core-government": "^0.1.6",
     "@civ-clone/core-player-world": "^0.1.14",
+    "@civ-clone/core-strategy": "^0.1.0",
     "@civ-clone/core-treasury": "^0.1.9",
+    "@civ-clone/core-wonder": "^0.1.5",
+    "@civ-clone/library-city": "^0.1.4",
+    "@civ-clone/library-science": "^0.1.0",
     "@civ-clone/simple-world-generator": "^0.1.6",
     "@types/chai": "^4.0.0",
     "@types/mocha": "^10.0.0",
@@ -42,11 +46,14 @@
   },
   "dependencies": {
     "@civ-clone/base-civilization-barbarian": "^0.1.1",
+    "@civ-clone/base-unit-action-nuclear-attack": "^0.1.0",
+    "@civ-clone/base-unit-action-steal-technology": "^0.1.0",
     "@civ-clone/civ1-barbarians": "github:civ-clone/civ1-barbarians",
     "@civ-clone/civ1-city": "github:civ-clone/civ1-city",
     "@civ-clone/civ1-city-improvement": "github:civ-clone/civ1-city-improvement",
     "@civ-clone/civ1-difficulty": "github:civ-clone/civ1-difficulty",
     "@civ-clone/civ1-unit": "github:civ-clone/civ1-unit",
+    "@civ-clone/civ1-wonder": "github:civ-clone/civ1-wonder",
     "@civ-clone/civ1-world": "github:civ-clone/civ1-world",
     "@civ-clone/civ1-world-civilizations": "github:civ-clone/civ1-world-civilizations",
     "@civ-clone/core-city": "^0.1.24",
@@ -60,6 +67,7 @@
     "@civ-clone/core-turn-based-game": "^0.1.9",
     "@civ-clone/core-unit": "^0.1.29",
     "@civ-clone/core-world": "^0.1.22",
-    "@civ-clone/core-yield": "^0.1.5"
+    "@civ-clone/core-yield": "^0.1.5",
+    "@civ-clone/library-diplomacy": "^0.1.3"
   }
 }

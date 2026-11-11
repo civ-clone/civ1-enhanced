@@ -10,12 +10,14 @@ const registerRules_2 = require("@civ-clone/civ1-city/registerRules");
 const registerRules_3 = require("@civ-clone/civ1-city-improvement/registerRules");
 const registerRules_4 = require("../../registerRules");
 const registerRules_5 = require("@civ-clone/civ1-unit/registerRules");
+const registerRules_6 = require("@civ-clone/civ1-wonder/registerRules");
 const registers = {
     'civ1-barbarians': registerRules_1.default,
     'civ1-city': registerRules_2.default,
     'civ1-city-improvement': registerRules_3.default,
     'civ1-enhanced': registerRules_4.default,
     'civ1-unit': registerRules_5.default,
+    'civ1-wonder': registerRules_6.default,
 };
 /** The order the plugin loader registers packages in: by name. */
 exports.pluginOrder = Object.keys(registers).sort();
@@ -25,6 +27,7 @@ exports.civ1Packages = [
     'civ1-city',
     'civ1-city-improvement',
     'civ1-unit',
+    'civ1-wonder',
 ];
 /**
  * A game with the Civ1 packages named (all of them unless told otherwise) and this one registered against it, in the

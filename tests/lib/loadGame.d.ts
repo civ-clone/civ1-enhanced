@@ -5,7 +5,8 @@ export type Civ1Package =
   | 'civ1-barbarians'
   | 'civ1-city'
   | 'civ1-city-improvement'
-  | 'civ1-unit';
+  | 'civ1-unit'
+  | 'civ1-wonder';
 export type Package = Civ1Package | 'civ1-enhanced';
 /** The order the plugin loader registers packages in: by name. */
 export declare const pluginOrder: Package[];

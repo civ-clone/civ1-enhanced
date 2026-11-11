@@ -26,7 +26,7 @@ fourteen are `@civ-clone/civ1-civilization`'s, which this package does not load.
 Where a rule below says "the human", that is every player whose seat is not played by the computer (`civ1-difficulty`'s
 `isHuman`: a player with a client, none of them an `AIClient`), each counting as v474.05's one human. In a game with
 no such seat (all computer players, or a game only watched), the v474.05 pollution and uprising rules never fire, so
-switching those sets off there means no pollution and no uprisings at all.
+switching those sets off there means no pollution and no uprisings at all, and the United Nations stops no war.
 
 - `civ1-enhanced:hydro-plant-site` (`HYDRO_PLANT_SITE`), off to start with: `civ1-enhanced:city/build/hydro-plant-site`
   lets a city build a Hydro Plant with Mountains or a River on its own square as well as next to it, as the manual's
@@ -61,3 +61,22 @@ switching those sets off there means no pollution and no uprisings at all.
   `civ1-enhanced:turn/start/land-uprising` lets an uprising break out near any civilization's city
   (civ-clone/web-renderer#27), through `civ1-barbarians`' `lib/landUprising`, so `barbarians:uprising` is emitted as
   before. Supersedes `civ1-barbarians:turn/start/land-uprising`, which, as v474.05, lets only the human's cities rise.
+- `civ1-enhanced:united-nations-stops-computer-wars` (`UNITED_NATIONS_STOPS_COMPUTER_WARS`), on to start with:
+  `civ1-enhanced:player/pacified/united-nations` pacifies every other leader towards the owner of the United Nations,
+  a computer player's too, so two computer players that meet don't go to war with its owner (civ-clone/web-renderer#30).
+  Supersedes `civ1-wonder:player/pacified/united-nations`, which, as v474.05, pacifies a computer player's leader only
+  towards a human owner. The Great Wall's rule is v474.05's in either case, and stops computer players going to war
+  with its owner (civ-clone/web-renderer#960).
+- `civ1-enhanced:even-advance-stealing` (`EVEN_ADVANCE_STEALING`), on to start with:
+  `civ1-enhanced:unit/technology-stolen/steal` has a Diplomat take any advance it can, each as likely as the next
+  (civ-clone/web-renderer#58), through `civ1-unit`'s `lib/stealAdvance`. Supersedes
+  `civ1-unit:unit/technology-stolen/steal`, which, as v474.05, walks its list of advances from a random one and takes
+  the first it can, so an advance after a run the thief knows is likelier.
+- `civ1-enhanced:sdi-defense-spares-cities` (`SDI_DEFENSE_SPARES_CITIES`), off to start with:
+  `civ1-enhanced:unit/detonated/halve-cities` spares a city with SDI Defense its size as well as its units under a
+  nuclear attack, as players commonly believe and Civ2 has it (civ-clone/web-renderer#129). Supersedes
+  `civ1-unit:unit/detonated/halve-cities`, which, as v474.05, halves it all the same. Fallout still lands around it.
+- `civ1-enhanced:defectors-stay-veteran` (`DEFECTORS_STAY_VETERAN`), off to start with:
+  `civ1-enhanced:unit/transferred/keep-veteran` lets a unit that changes sides, bribed or with a city, keep its veteran
+  status, through `civ1-unit`'s `lib/startAfresh`; it is still unfortified, with no moves and its fuel full. Supersedes
+  `civ1-unit:unit/transferred/start-afresh`, which, as v474.05, starts it afresh as a new unit, no veteran.
