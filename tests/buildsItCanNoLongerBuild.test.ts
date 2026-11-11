@@ -56,6 +56,7 @@ import {
   Requirement,
 } from '@civ-clone/core-requirement/Requirement';
 import { Food, Production } from '@civ-clone/civ1-world/Yields';
+import { Build, IBuildCriterion } from '@civ-clone/core-city-build/Rules/Build';
 import { deriveBuildRules } from '@civ-clone/civ1-city-improvement/Rules/City/build';
 import { expect } from 'chai';
 
@@ -534,9 +535,12 @@ describe('a build its city can no longer make, as that happens (civ-clone/web-re
     });
 
     // As above: this records the path, whose shrink has destroyed the city before the capture rules here run.
-    // As `civ1-player`'s turn start: a city's Food, then its Production. A size-1 city that starves to nothing on its
-    //  Food can still complete the Hoover Dam on its Production, registered against the destroyed city: the
-    //  `BuildingComplete` rule's guard keeps the player's plant elsewhere.
+    // As `civ1-player`'s turn start, sequenced here by hand as civ1-player is not loaded in these tests:
+    //  `civ1-player:player/turn-start/process-city-yields` (civ1-player `Rules/Player/turn-start.ts`) takes
+    //  `cityRegistry.getByPlayer(player)` once, then for each city processes `ProcessYield` for its consolidated Food,
+    //  Production and Trade, in that order. A size-1 city that starves to nothing on its Food still has its Production
+    //  processed, and can complete the Hoover Dam, registered against the destroyed city: the `BuildingComplete` rule's
+    //  guard keeps the player's plant elsewhere.
     it('should drop no plant when a city completes the Hoover Dam on the turn it starves to nothing', async (): Promise<void> => {
       const { cancelled, city, game, player } = await setUp(),
         dam = city(player, 2, 2, [], HooverDam as never),
@@ -572,65 +576,107 @@ describe('a build its city can no longer make, as that happens (civ-clone/web-re
   });
 
   // A plugin's entry of range `player`: a Bank needs a Marketplace in one of its player's cities. The city that loses the
-  //  player's only one builds something else, so it is noted for the entry's range, not for its own build; each way of
-  //  losing it agrees with the others.
-  (['sold', 'sabotaged', 'not paid for'] as const).forEach((how): void => {
-    it(`should drop a Bank elsewhere when the player's only Marketplace is ${how}, under a \`player\` entry`, async (): Promise<void> => {
-      const { cancelled, city, game, player, rival } = await setUp([], [0]),
-        x = city(player, 2, 2, [Marketplace], Factory as never),
-        y = city(player, 5, 2);
+  //  player's only one builds something else, so it is sabotaged or left unpaid only if it is noted for the entry's
+  //  range (`anyWiderNeed`), not for its own build; each way of losing it agrees with the others. The sale has no
+  //  note, so its test is not one of the gate's. The entry comes either with the rule made from it, or, describing a
+  //  rule the plugin wrote by hand, after that rule is in play and a yield has been processed: the gate's answer is
+  //  kept for the rules and the count of entries, so a describing entry registered late is still seen.
+  (['sold', 'sabotaged', 'not paid for'] as const).forEach((how): void =>
+    (
+      [
+        ['with the rule made from it', false],
+        ['describing a rule written by hand, registered after a yield', true],
+      ] as [string, boolean][]
+    ).forEach(([entryName, late]): void => {
+      it(`should drop a Bank elsewhere when the player's only Marketplace is ${how}, under a \`player\` entry ${entryName}${
+        how === 'sold' ? ' (a sale has no note to gate)' : ''
+      }`, async (): Promise<void> => {
+        const { cancelled, city, game, player, rival } = await setUp([], [0]),
+          x = city(player, 2, 2, [Marketplace], Factory as never),
+          y = city(player, 5, 2);
 
-      // As a captured city's kept build: chosen where it could be, then left without what it needs.
-      new Marketplace(y.city, game.rules);
-      y.cityBuild.build(Bank as never);
-      game.cityImprovements
-        .getByCity(y.city)
-        .filter((improvement) => improvement instanceof Marketplace)
-        .forEach((improvement) => improvement.destroy());
-      game.requirements.add(
-        deriveBuildRules(game.cityImprovements, game.playerResearch),
-        new Requirement({
+        // As a captured city's kept build: chosen where it could be, then left without what it needs.
+        new Marketplace(y.city, game.rules);
+        y.cityBuild.build(Bank as never);
+        game.cityImprovements
+          .getByCity(y.city)
+          .filter((improvement) => improvement instanceof Marketplace)
+          .forEach((improvement) => improvement.destroy());
+        const entry = new Requirement({
           id: 'test:city/build/bank-needs-a-marketplace-somewhere',
           subject: Bank,
           relation: 'requires',
           targets: [Marketplace],
           range: 'player',
-        })
-      );
+        });
 
-      if (how === 'sold') {
-        game.rules.register(
-          new Sell(new Effect((): SpendCost => new SpendCost(Gold, 80)))
-        );
-        new PlayerTreasury(player, Gold, game.cityBuilds, game.rules).sell(
-          x.has[0]
-        );
-      } else if (how === 'sabotaged') {
-        game.rules.process(
-          CitySabotaged,
-          { player: (): Player => rival } as unknown as Unit,
-          x.city
-        );
-      } else {
-        game.rules.register(
-          new ProcessYield(
-            new Criterion(
-              (cityYield: unknown): boolean => cityYield instanceof Gold
-            ),
-            new Effect((): void => game.cityImprovements.unregister(x.has[0]))
-          )
-        );
-        game.rules.process(ProcessYield, new Gold(), x.city, []);
-      }
+        if (late) {
+          game.rules.register(
+            new Build(
+              entry.id,
+              Bank,
+              new Criterion(
+                (city: City, Item: unknown): boolean => Item === Bank
+              ),
+              new Effect(
+                (city: City): IBuildCriterion =>
+                  new Criterion((): boolean =>
+                    game.cityImprovements
+                      .filter(
+                        (improvement: CityImprovement): boolean =>
+                          improvement instanceof Marketplace &&
+                          !improvement.destroyed() &&
+                          improvement.city().player() === city.player()
+                      )
+                      .some((improvement) => improvement.city() !== y.city)
+                  )
+              )
+            )
+          );
+          // A yield processed in X, with nothing yet describing the rule.
+          game.rules.process(ProcessYield, new Production(0), x.city, []);
+          game.requirements.register(entry);
+        } else {
+          game.requirements.add(
+            deriveBuildRules(game.cityImprovements, game.playerResearch),
+            entry
+          );
+        }
 
-      expect(names(game.cityImprovements.getByCity(x.city))).eql(['Palace']);
-      expect(building(x.cityBuild)).equal(Factory);
-      expect(building(y.cityBuild)).null;
-      expect(cancelled.map(([cancelledIn]) => cancelledIn.name())).eql([
-        y.city.name(),
-      ]);
-    });
-  });
+        if (how === 'sold') {
+          game.rules.register(
+            new Sell(new Effect((): SpendCost => new SpendCost(Gold, 80)))
+          );
+          new PlayerTreasury(player, Gold, game.cityBuilds, game.rules).sell(
+            x.has[0]
+          );
+        } else if (how === 'sabotaged') {
+          game.rules.process(
+            CitySabotaged,
+            { player: (): Player => rival } as unknown as Unit,
+            x.city
+          );
+        } else {
+          game.rules.register(
+            new ProcessYield(
+              new Criterion(
+                (cityYield: unknown): boolean => cityYield instanceof Gold
+              ),
+              new Effect((): void => game.cityImprovements.unregister(x.has[0]))
+            )
+          );
+          game.rules.process(ProcessYield, new Gold(), x.city, []);
+        }
+
+        expect(names(game.cityImprovements.getByCity(x.city))).eql(['Palace']);
+        expect(building(x.cityBuild)).equal(Factory);
+        expect(building(y.cityBuild)).null;
+        expect(cancelled.map(([cancelledIn]) => cancelledIn.name())).eql([
+          y.city.name(),
+        ]);
+      });
+    })
+  );
 
   describe('a Wonder its player gains that excludes it', (): void => {
     switched.forEach(([name, sets, drops]): void => {

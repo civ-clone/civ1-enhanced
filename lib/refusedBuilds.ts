@@ -244,10 +244,12 @@ const isLosable = (target: Target): boolean =>
   !isWonder(target);
 
 // Whether any `requires` entry naming a losable improvement speaks for more than its own city, worked out once for each
-//  list of `Build` rules: `rules.get` hands back the same array until a rule is registered, unregistered, switched on
-//  or off, and an entry can only refuse a build through a rule made from it, so a new list is the only time the answer
-//  can change (as `core-city-build`'s `buildRulesFor` relies on).
-const wideNeeds: WeakMap<object, boolean> = new WeakMap();
+//  list of `Build` rules and count of entries, both read in O(1): `rules.get` hands back the same array until a rule is
+//  registered, unregistered, switched on or off (as `core-city-build`'s `buildRulesFor` relies on), and the
+//  requirements' `length` changes as an entry is added, registered to describe a hand-written rule, or removed. Not
+//  seen: an entry replaced by another of the same count that makes no rules (a describing entry whose range changed).
+const wideNeeds: WeakMap<object, { entries: number; wide: boolean }> =
+  new WeakMap();
 
 /**
  * Whether a `requires` entry naming a losable improvement has a range wider than its city (`player`, `world`): a city
@@ -256,20 +258,23 @@ const wideNeeds: WeakMap<object, boolean> = new WeakMap();
 export const anyWiderNeed = (
   game: Pick<Game, 'requirements' | 'rules'>
 ): boolean => {
-  const key = game.rules.get(Build);
-  let wide = wideNeeds.get(key);
+  const key = game.rules.get(Build),
+    entries = game.requirements.length,
+    cached = wideNeeds.get(key);
 
-  if (wide === undefined) {
-    wide = game.requirements.some(
-      (entry: Requirement): boolean =>
-        entry.relation === 'requires' &&
-        entry.range !== 'city' &&
-        entry.range !== 'tile' &&
-        entry.targets.some(isLosable)
-    );
-
-    wideNeeds.set(key, wide);
+  if (cached !== undefined && cached.entries === entries) {
+    return cached.wide;
   }
+
+  const wide = game.requirements.some(
+    (entry: Requirement): boolean =>
+      entry.relation === 'requires' &&
+      entry.range !== 'city' &&
+      entry.range !== 'tile' &&
+      entry.targets.some(isLosable)
+  );
+
+  wideNeeds.set(key, { entries, wide });
 
   return wide;
 };
