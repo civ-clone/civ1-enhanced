@@ -4,14 +4,22 @@ import {
   HYDRO_PLANT_SITE,
   OBSOLETE_BUILDS,
 } from './RuleSets';
+import {
+  HYDRO_PLANT_SITE_RULE,
+  RANSOM_RULE,
+  REVALIDATE_BUILDS_RULE,
+} from './RuleIds';
 import { Game, defaultGame } from '@civ-clone/core-game';
+import { HYDRO_PLANT_SITE_RULE as CIV1_HYDRO_PLANT_SITE_RULE } from '@civ-clone/civ1-city-improvement/RuleIds';
+import { RANSOM_RULE as CIV1_RANSOM_RULE } from '@civ-clone/civ1-barbarians/RuleIds';
 import RuleSet from '@civ-clone/core-rule/RuleSet';
 import cityBuild from './Rules/City/build';
 import playerResearchComplete from './Rules/Player/researchComplete';
 import unitDestroyed from './Rules/Unit/destroyed';
 
 export const register = (game: Game): void => {
-  // The sets before their rules, so each rule is switched as it arrives: the Hydro Plant's starts off. A set of its own
+  // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
+  //  rules running. The sets before their rules, so each rule is switched as it arrives: the Hydro Plant's starts off. A set of its own
   //  for each game, as a game may add to its sets.
   game.ruleSets.register(
     new RuleSet(
@@ -20,20 +28,17 @@ export const register = (game: Game): void => {
         HYDRO_PLANT_SITE,
         {
           enabled: false,
-          supersedes: ['civ1-city-improvement:city/build/hydro-plant-site'],
+          supersedes: [CIV1_HYDRO_PLANT_SITE_RULE],
         },
-        'civ1-enhanced:city/build/hydro-plant-site'
+        HYDRO_PLANT_SITE_RULE
       ),
       new RuleSet(
         BARBARIAN_LEADER_RANSOM,
-        { supersedes: ['civ1-barbarians:unit/defeated/ransom'] },
-        'civ1-enhanced:unit/destroyed/ransom'
+        { supersedes: [CIV1_RANSOM_RULE] },
+        RANSOM_RULE
       ),
       // A rule added to Civ1's, so nothing to supersede: switched off, v474.05's play is what is left.
-      new RuleSet(
-        OBSOLETE_BUILDS,
-        'civ1-enhanced:player/research-complete/revalidate-builds'
-      )
+      new RuleSet(OBSOLETE_BUILDS, REVALIDATE_BUILDS_RULE)
     )
   );
 

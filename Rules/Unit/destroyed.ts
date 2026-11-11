@@ -3,6 +3,7 @@ import Criterion from '@civ-clone/core-rule/Criterion';
 import Destroyed from '@civ-clone/core-unit/Rules/Destroyed';
 import { Diplomat } from '@civ-clone/civ1-unit/Units';
 import Effect from '@civ-clone/core-rule/Effect';
+import { RANSOM_RULE } from '../../RuleIds';
 import Player from '@civ-clone/core-player/Player';
 import Unit from '@civ-clone/core-unit/Unit';
 import isBarbarian from '@civ-clone/base-civilization-barbarian/isBarbarian';
@@ -16,7 +17,7 @@ import isBarbarian from '@civ-clone/base-civilization-barbarian/isBarbarian';
  */
 export const getRules = (game: RansomGame): Destroyed[] => [
   new Destroyed(
-    'civ1-enhanced:unit/destroyed/ransom',
+    RANSOM_RULE,
     new Criterion(
       (unit: Unit): boolean =>
         unit instanceof Diplomat && isBarbarian(unit.player())

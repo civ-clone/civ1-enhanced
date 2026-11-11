@@ -4,19 +4,19 @@ import {
   HYDRO_PLANT_SITE,
   OBSOLETE_BUILDS,
 } from '../RuleSets';
+// The Civ1 rules this package's sets change, and the rules they change them with (civ-clone/web-renderer#954).
 import { Game } from '@civ-clone/core-game/Game';
 import { expect } from 'chai';
 import loadGame from './lib/loadGame';
 import register from '../registerRules';
 
-// The Civ1 rules this package's sets change, and the rules they change them with (civ-clone/web-renderer#954).
-const CIV1_HYDRO_PLANT_SITE =
-    'civ1-city-improvement:city/build/hydro-plant-site',
-  CIV1_RANSOM = 'civ1-barbarians:unit/defeated/ransom',
-  HYDRO_PLANT_SITE_RULE = 'civ1-enhanced:city/build/hydro-plant-site',
-  RANSOM_RULE = 'civ1-enhanced:unit/destroyed/ransom',
-  REVALIDATE_BUILDS_RULE =
-    'civ1-enhanced:player/research-complete/revalidate-builds';
+import {
+  HYDRO_PLANT_SITE_RULE,
+  RANSOM_RULE,
+  REVALIDATE_BUILDS_RULE,
+} from '../RuleIds';
+import { HYDRO_PLANT_SITE_RULE as CIV1_HYDRO_PLANT_SITE } from '@civ-clone/civ1-city-improvement/RuleIds';
+import { RANSOM_RULE as CIV1_RANSOM } from '@civ-clone/civ1-barbarians/RuleIds';
 
 const enabled = (game: Game, id: string): boolean =>
   game.rules.getById(id)!.enabled();
@@ -97,6 +97,23 @@ describe('registerRules', (): void => {
     expect(enabled(game, RANSOM_RULE)).true;
     expect(enabled(game, REVALIDATE_BUILDS_RULE)).true;
     expect(game.ruleSets.validate()).to.eql([]);
+  });
+
+  // A superseded id that names no rule is only shown (`unknown-superseded`), not blocking, and the rule it meant goes
+  //  on running beside its replacement: a renamed Civ1 ransom rule paid a lone leader 200 gold.
+  it('should supersede only rules that are registered, with every package loaded, so no Civ1 rule runs beside its replacement', (): void => {
+    const game = loadGame(),
+      superseded = game.ruleSets.entries().flatMap((set) => set.supersedes());
+
+    expect(superseded).to.eql([CIV1_HYDRO_PLANT_SITE, CIV1_RANSOM]);
+    superseded.forEach((id: string): void => {
+      expect(game.rules.getById(id), id).not.to.be.null;
+    });
+    expect(
+      game.ruleSets
+        .validate()
+        .filter(({ kind }) => kind === 'unknown-superseded')
+    ).to.eql([]);
   });
 
   it('should find no problems with every package loaded, in either state', (): void => {

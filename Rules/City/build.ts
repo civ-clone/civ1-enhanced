@@ -3,6 +3,7 @@ import { Mountains, River } from '@civ-clone/civ1-world/Terrains';
 import City from '@civ-clone/core-city/City';
 import Criterion from '@civ-clone/core-rule/Criterion';
 import Effect from '@civ-clone/core-rule/Effect';
+import { HYDRO_PLANT_SITE_RULE } from '../../RuleIds';
 import { HydroPlant } from '@civ-clone/civ1-city-improvement/CityImprovements';
 import { IConstructor } from '@civ-clone/core-registry/Registry';
 import Tile from '@civ-clone/core-world/Tile';
@@ -15,7 +16,7 @@ import Tile from '@civ-clone/core-world/Tile';
  */
 export const hydroPlantSiteRule = (): Build =>
   new Build(
-    'civ1-enhanced:city/build/hydro-plant-site',
+    HYDRO_PLANT_SITE_RULE,
     HydroPlant,
     new Criterion(
       (city: City, BuildItem: IConstructor): boolean => BuildItem === HydroPlant

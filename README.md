@@ -9,6 +9,9 @@ A set that `supersedes` a Civ1 rule takes its place while the set is on, and giv
 the Civ1 package knowing (`@civ-clone/core-rule`'s `RuleSet`). One whose Civ1 package is not loaded is only an orphan,
 which `validate()` shows and does not block on.
 
+The ids it supersedes are imported from each Civ1 package's `RuleIds`, so a rule renamed there breaks this package's
+build rather than leaving both rules running. Its own rule ids are exported the same way, from `RuleIds.ts`.
+
 ## Rule sets
 
 - `civ1-enhanced:hydro-plant-site` (`HYDRO_PLANT_SITE`), off to start with: `civ1-enhanced:city/build/hydro-plant-site`
