@@ -21,7 +21,12 @@ import {
   SETTLERS_WAIT_FOR_SIZE_TWO,
 } from '../RuleSets';
 import { HooverDam, ManhattanProject } from '@civ-clone/civ1-wonder/Wonders';
-import loadGame, { buildWorld, scriptedRng } from './lib/loadGame';
+import loadGame, {
+  Package,
+  buildWorld,
+  pluginOrder,
+  scriptedRng,
+} from './lib/loadGame';
 import BuildingCancelled from '@civ-clone/core-city-build/Rules/BulidingCancelled';
 import AIClient from '@civ-clone/core-ai-client/AIClient';
 import Buildable from '@civ-clone/core-city-build/Buildable';
@@ -29,6 +34,7 @@ import City from '@civ-clone/core-city/City';
 import CityBuild from '@civ-clone/core-city-build/CityBuild';
 import CityImprovement from '@civ-clone/core-city-improvement/CityImprovement';
 import Client from '@civ-clone/core-client/Client';
+import Captured from '@civ-clone/core-city/Rules/Captured';
 import CitySabotaged from '@civ-clone/base-unit-action-industrial-sabotage/Rules/CitySabotaged';
 import Criterion from '@civ-clone/core-rule/Criterion';
 import Effect from '@civ-clone/core-rule/Effect';
@@ -49,7 +55,7 @@ import {
   IRequirement,
   Requirement,
 } from '@civ-clone/core-requirement/Requirement';
-import { Food } from '@civ-clone/civ1-world/Yields';
+import { Food, Production } from '@civ-clone/civ1-world/Yields';
 import { deriveBuildRules } from '@civ-clone/civ1-city-improvement/Rules/City/build';
 import { expect } from 'chai';
 
@@ -57,9 +63,14 @@ type Sets = [string, boolean][];
 
 // A game with every Civ1 package this one changes and its own, `sets` switched as given, and two players, `player` and
 //  `rival`, who know enough to build a Bank, a Power Plant, the Hoover Dam and a Nuclear unit. All the land is one
-//  continent but the far corner. Sabotage draws from `rolls`, then 0.
-const setUp = async (sets: Sets = [], rolls: number[] = []) => {
-  const game: Game = loadGame(undefined, undefined, {
+//  continent but the far corner. Sabotage draws from `rolls`, then 0. The packages load in `order`, the plugin
+//  loader's unless told.
+const setUp = async (
+  sets: Sets = [],
+  rolls: number[] = [],
+  order: Package[] = pluginOrder
+) => {
+  const game: Game = loadGame(undefined, order, {
       rng: scriptedRng(rolls),
     }),
     world = await buildWorld(game, 9),
@@ -503,8 +514,9 @@ describe('a build its city can no longer make, as that happens (civ-clone/web-re
 
     // The engine's own path: with `SETTLERS_WAIT_FOR_SIZE_TWO` off, on a level other than Chieftain (none set is King),
     //  a size-1 city whose player has others is removed by `civ1-unit:city/building-complete/settlers-shrink-city`, its
-    //  Settlers homed in the nearest other city.
-    it('should drop nothing when the city completes Settlers, which takes the last of it', async (): Promise<void> => {
+    //  Settlers homed in the nearest other city. This records that the path drops nothing; no guard here is what keeps
+    //  it so, as no entry names Settlers or anything the city held is lost (the next test is the guard's).
+    it('the path that removes a city completing Settlers drops nothing', async (): Promise<void> => {
       const { builds, cancelled, game, rival, site } = await wonderCity(
         [],
         Settlers as never,
@@ -521,7 +533,32 @@ describe('a build its city can no longer make, as that happens (civ-clone/web-re
       expectNothingDropped(cancelled, builds, site.city);
     });
 
-    it('should drop nothing when the city is destroyed as it is captured', async (): Promise<void> => {
+    // As above: this records the path, whose shrink has destroyed the city before the capture rules here run.
+    // As `civ1-player`'s turn start: a city's Food, then its Production. A size-1 city that starves to nothing on its
+    //  Food can still complete the Hoover Dam on its Production, registered against the destroyed city: the
+    //  `BuildingComplete` rule's guard keeps the player's plant elsewhere.
+    it('should drop no plant when a city completes the Hoover Dam on the turn it starves to nothing', async (): Promise<void> => {
+      const { cancelled, city, game, player } = await setUp(),
+        dam = city(player, 2, 2, [], HooverDam as never),
+        plant = city(player, 4, 2, [Factory], PowerPlant as never);
+
+      dam.cityBuild.add(dam.cityBuild.cost());
+      game.rules.process(ProcessYield, new Food(-1000), dam.city, []);
+
+      expect(dam.city.destroyed()).true;
+
+      game.rules.process(ProcessYield, new Production(0), dam.city, []);
+
+      expect(names(game.wonders.getByPlayer(player))).eql(['HooverDam']);
+      expect(
+        cancelled
+          .filter(([cancelledIn]) => cancelledIn !== dam.city)
+          .map(([cancelledIn]) => cancelledIn.name())
+      ).eql([]);
+      expect(building(plant.cityBuild)).equal(PowerPlant);
+    });
+
+    it('the path that destroys a city as it is captured drops nothing', async (): Promise<void> => {
       const { builds, cancelled, player, site } = await wonderCity(
         [],
         Settlers as never
@@ -531,6 +568,67 @@ describe('a build its city can no longer make, as that happens (civ-clone/web-re
 
       expect(site.city.destroyed()).true;
       expectNothingDropped(cancelled, builds, site.city);
+    });
+  });
+
+  // A plugin's entry of range `player`: a Bank needs a Marketplace in one of its player's cities. The city that loses the
+  //  player's only one builds something else, so it is noted for the entry's range, not for its own build; each way of
+  //  losing it agrees with the others.
+  (['sold', 'sabotaged', 'not paid for'] as const).forEach((how): void => {
+    it(`should drop a Bank elsewhere when the player's only Marketplace is ${how}, under a \`player\` entry`, async (): Promise<void> => {
+      const { cancelled, city, game, player, rival } = await setUp([], [0]),
+        x = city(player, 2, 2, [Marketplace], Factory as never),
+        y = city(player, 5, 2);
+
+      // As a captured city's kept build: chosen where it could be, then left without what it needs.
+      new Marketplace(y.city, game.rules);
+      y.cityBuild.build(Bank as never);
+      game.cityImprovements
+        .getByCity(y.city)
+        .filter((improvement) => improvement instanceof Marketplace)
+        .forEach((improvement) => improvement.destroy());
+      game.requirements.add(
+        deriveBuildRules(game.cityImprovements, game.playerResearch),
+        new Requirement({
+          id: 'test:city/build/bank-needs-a-marketplace-somewhere',
+          subject: Bank,
+          relation: 'requires',
+          targets: [Marketplace],
+          range: 'player',
+        })
+      );
+
+      if (how === 'sold') {
+        game.rules.register(
+          new Sell(new Effect((): SpendCost => new SpendCost(Gold, 80)))
+        );
+        new PlayerTreasury(player, Gold, game.cityBuilds, game.rules).sell(
+          x.has[0]
+        );
+      } else if (how === 'sabotaged') {
+        game.rules.process(
+          CitySabotaged,
+          { player: (): Player => rival } as unknown as Unit,
+          x.city
+        );
+      } else {
+        game.rules.register(
+          new ProcessYield(
+            new Criterion(
+              (cityYield: unknown): boolean => cityYield instanceof Gold
+            ),
+            new Effect((): void => game.cityImprovements.unregister(x.has[0]))
+          )
+        );
+        game.rules.process(ProcessYield, new Gold(), x.city, []);
+      }
+
+      expect(names(game.cityImprovements.getByCity(x.city))).eql(['Palace']);
+      expect(building(x.cityBuild)).equal(Factory);
+      expect(building(y.cityBuild)).null;
+      expect(cancelled.map(([cancelledIn]) => cancelledIn.name())).eql([
+        y.city.name(),
+      ]);
     });
   });
 
@@ -581,6 +679,50 @@ describe('a build its city can no longer make, as that happens (civ-clone/web-re
           // What its previous owner was building is not theirs to drop.
           expect(building(rivals.cityBuild)).equal(PowerPlant);
         });
+      });
+    });
+
+    // After every `Low` rule of the capture, civ1-barbarians' burning among them, whichever package loads first.
+    (
+      [
+        [
+          'with civ1-enhanced first',
+          [
+            'civ1-enhanced',
+            ...pluginOrder.filter((name) => name !== 'civ1-enhanced'),
+          ],
+        ],
+        [
+          'with civ1-enhanced last',
+          [
+            ...pluginOrder.filter((name) => name !== 'civ1-enhanced'),
+            'civ1-enhanced',
+          ],
+        ],
+      ] as [string, Package[]][]
+    ).forEach(([name, order]): void => {
+      it(`should drop the captor's plant after the capture's other rules, ${name}`, async (): Promise<void> => {
+        const { city, game, player, rival } = await setUp([], [], order),
+          dam = city(rival, 2, 2),
+          plant = city(player, 4, 2, [Factory], PowerPlant as never),
+          ids = game.rules
+            .get(Captured)
+            .map((rule): string | null => rule.id());
+
+        expect(ids[ids.length - 1]).equal(
+          'civ1-enhanced:city/captured/drop-excluded-builds'
+        );
+        expect(ids.indexOf('civ1-barbarians:city/captured/burn')).lessThan(
+          ids.length - 1
+        );
+
+        game.wonders.register(new HooverDam(dam.city, game.rules));
+        game.cityGrowth.getByCity(dam.city).grow();
+        game.cityGrowth.getByCity(dam.city).grow();
+
+        dam.city.capture(player);
+
+        expect(building(plant.cityBuild)).null;
       });
     });
 

@@ -16,6 +16,8 @@ import Captured from '@civ-clone/core-city/Rules/Captured';
  * At `Low`, after the rules that put what was built in its registry (`civ1-wonder`'s, for a Wonder) whatever order the
  * packages load in.
  */
+/** After `Low` (3000): the capture's own rules have all run. */
+export declare const DROP_EXCLUDED_CAPTURED_PRIORITY = 3500;
 export declare const getRules: (
   game: RefusedBuildsGame
 ) => (BuildingComplete | Captured)[];

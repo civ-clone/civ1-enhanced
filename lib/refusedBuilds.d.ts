@@ -92,7 +92,7 @@ export declare const possessions: (
 ) => CityImprovement[];
 /**
  * The improvements `city` has that it can lose and still stand: not its Wonders. A Wonder leaves a city only with the
- * city itself (`civ1-wonder:city/destroyed`) or with its capture (the captor then holds it): it can't be sold
+ * city itself (civ1-wonder's `Destroyed` rule, which has no id, unregisters it) or with its capture (the captor then holds it): it can't be sold
  * (`civ1-treasury:city-improvement/sell/value`), sabotaged (`civ1-unit:unit/city-sabotaged/sabotage`) or left unpaid
  * (it has no upkeep), and v474.05 counts one lost with its city as built (ECONOMY.C 94-96, 172, 202), so nothing is
  * dropped for want of one (civ-clone/web-renderer#965).
@@ -112,11 +112,19 @@ export declare const dropBuildsThatNeeded: (
   player: Player
 ) => void;
 /**
- * Whether what `city` is building is the subject of a `requires` entry that names an improvement other than a Wonder:
- * the only builds a lost one can refuse (`losableImprovements`), so the only cities worth noting what they have.
+ * Whether a `requires` entry naming a losable improvement has a range wider than its city (`player`, `world`): a city
+ * that loses one may then drop builds in other cities, whatever it builds itself.
+ */
+export declare const anyWiderNeed: (
+  game: Pick<Game, 'requirements' | 'rules'>
+) => boolean;
+/**
+ * Whether what `city` would lose matters to any build: its own build is the subject of a `requires` entry naming a
+ * losable improvement, or some such entry speaks for more than its own city (`anyWiderNeed`). Only those cities are
+ * noted: it answers as noting every city would, as a city noted for nothing drops nothing.
  */
 export declare const mayNeedAnImprovement: (
-  game: Pick<Game, 'cityBuilds' | 'requirements'>,
+  game: Pick<Game, 'cityBuilds' | 'requirements' | 'rules'>,
   city: City
 ) => boolean;
 export default dropBuildsRefusedBy;

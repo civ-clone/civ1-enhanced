@@ -191,7 +191,7 @@ const isWonder = (thing: object): boolean =>
 
 /**
  * The improvements `city` has that it can lose and still stand: not its Wonders. A Wonder leaves a city only with the
- * city itself (`civ1-wonder:city/destroyed`) or with its capture (the captor then holds it): it can't be sold
+ * city itself (civ1-wonder's `Destroyed` rule, which has no id, unregisters it) or with its capture (the captor then holds it): it can't be sold
  * (`civ1-treasury:city-improvement/sell/value`), sabotaged (`civ1-unit:unit/city-sabotaged/sabotage`) or left unpaid
  * (it has no upkeep), and v474.05 counts one lost with its city as built (ECONOMY.C 94-96, 172, 202), so nothing is
  * dropped for want of one (civ-clone/web-renderer#965).
@@ -237,28 +237,63 @@ export const dropBuildsThatNeeded = (
   );
 };
 
+/** Whether `target` is a class of improvement a city can lose (`losableImprovements`). */
+const isLosable = (target: Target): boolean =>
+  typeof target === 'function' &&
+  Object.prototype.isPrototypeOf.call(CityImprovement, target) &&
+  !isWonder(target);
+
+// Whether any `requires` entry naming a losable improvement speaks for more than its own city, worked out once for each
+//  list of `Build` rules: `rules.get` hands back the same array until a rule is registered, unregistered, switched on
+//  or off, and an entry can only refuse a build through a rule made from it, so a new list is the only time the answer
+//  can change (as `core-city-build`'s `buildRulesFor` relies on).
+const wideNeeds: WeakMap<object, boolean> = new WeakMap();
+
 /**
- * Whether what `city` is building is the subject of a `requires` entry that names an improvement other than a Wonder:
- * the only builds a lost one can refuse (`losableImprovements`), so the only cities worth noting what they have.
+ * Whether a `requires` entry naming a losable improvement has a range wider than its city (`player`, `world`): a city
+ * that loses one may then drop builds in other cities, whatever it builds itself.
+ */
+export const anyWiderNeed = (
+  game: Pick<Game, 'requirements' | 'rules'>
+): boolean => {
+  const key = game.rules.get(Build);
+  let wide = wideNeeds.get(key);
+
+  if (wide === undefined) {
+    wide = game.requirements.some(
+      (entry: Requirement): boolean =>
+        entry.relation === 'requires' &&
+        entry.range !== 'city' &&
+        entry.range !== 'tile' &&
+        entry.targets.some(isLosable)
+    );
+
+    wideNeeds.set(key, wide);
+  }
+
+  return wide;
+};
+
+/**
+ * Whether what `city` would lose matters to any build: its own build is the subject of a `requires` entry naming a
+ * losable improvement, or some such entry speaks for more than its own city (`anyWiderNeed`). Only those cities are
+ * noted: it answers as noting every city would, as a city noted for nothing drops nothing.
  */
 export const mayNeedAnImprovement = (
-  game: Pick<Game, 'cityBuilds' | 'requirements'>,
+  game: Pick<Game, 'cityBuilds' | 'requirements' | 'rules'>,
   city: City
 ): boolean => {
+  if (anyWiderNeed(game)) {
+    return true;
+  }
+
   const building = buildingIn(game, city);
 
   return (
     building !== null &&
     game.requirements
       .for(building.Item, 'requires')
-      .some((entry: Requirement): boolean =>
-        entry.targets.some(
-          (target: Target): boolean =>
-            typeof target === 'function' &&
-            Object.prototype.isPrototypeOf.call(CityImprovement, target) &&
-            !isWonder(target)
-        )
-      )
+      .some((entry: Requirement): boolean => entry.targets.some(isLosable))
   );
 };
 
