@@ -18,7 +18,8 @@ build rather than leaving both rules running. Its own rule ids are exported the 
 Loading this package also loads the twelve civilizations the original does not have (Sioux, Inca, Brazilian, Malian,
 Kongo, Ethiopian, Viking, Khmer, Indonesian, Japanese, Australian and Chukchi), with their leaders, traits, national
 themes and Earth start tiles. They are provided by `@civ-clone/civ1-world-civilizations`, which this package depends
-on and imports for its side effect, so a game with `civ1-enhanced` has them and one without does not.
+on and imports for its side effect, so a game with `civ1-enhanced` has them and one without does not. The original's
+fourteen are `@civ-clone/civ1-civilization`'s, which this package does not load.
 
 ## Rule sets
 
