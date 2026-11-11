@@ -24,6 +24,11 @@ import { Settlers } from '@civ-clone/civ1-unit/Units';
 import Unit from '@civ-clone/core-unit/Unit';
 import { expect } from 'chai';
 
+// Ids, not the objects: chai prints what it compares when an assertion fails, and a city or a unit leads to the whole
+//  game, which it can't print.
+const ids = (entities: ({ id(): string } | null)[]): (string | null)[] =>
+  entities.map((entity) => entity?.id() ?? null);
+
 // A game with civ1-city's and civ1-unit's rules and this package's, loaded in `order` (the plugin loader's unless
 //  told), at `level` (none set unless told), with `sets` switched as given, and one player whose cities are at `at`,
 //  the first building Settlers at `size`.
@@ -124,8 +129,8 @@ const asTheOriginal = (sets: [string, boolean][]): void => {
 
     expect(city.destroyed()).true;
     expect(settlers.destroyed()).false;
-    expect(settlers.tile()).equal(city.tile());
-    expect(settlers.city()).equal(others[0]);
+    expect(settlers.tile() === city.tile()).true;
+    expect(ids([settlers.city()])).eql(ids([others[0]]));
   });
 };
 
@@ -204,7 +209,7 @@ describe('Settlers in a city of size 1 (civ-clone/web-renderer#959)', (): void =
       expect(cityBuild.cleared()).eql({ reason: 'completed', item: Settlers });
       expect(cityGrowth.size()).equal(1);
       expect(city.destroyed()).false;
-      expect(game.units.getByCity(city)).eql([settlers]);
+      expect(ids(game.units.getByCity(city))).eql(ids([settlers]));
     });
 
     it('should take a citizen from a larger city, as before', async (): Promise<void> => {
