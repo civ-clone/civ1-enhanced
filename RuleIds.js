@@ -2,7 +2,7 @@
 // The ids of this package's rules that another package is expected to name (civ-clone/web-renderer#954): a set that
 //  supersedes one, or a host that switches or describes it. Imported, a rename breaks the other package's build.
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.KEEP_VETERAN_RULE = exports.HALVE_CITIES_RULE = exports.STEAL_RULE = exports.UNITED_NATIONS_PACIFIED_RULE = exports.LAND_UPRISING_RULE = exports.RAIDERS_ONLY_RULE = exports.POLLUTION_RULE = exports.CLEAR_CAPTURED_BUILD_RULE = exports.REVALIDATE_BUILDS_RULE = exports.RANSOM_RULE = exports.HYDRO_PLANT_SITE_RULE = void 0;
+exports.SETTLERS_WAIT_RULE = exports.KEEP_VETERAN_RULE = exports.HALVE_CITIES_RULE = exports.STEAL_RULE = exports.UNITED_NATIONS_PACIFIED_RULE = exports.LAND_UPRISING_RULE = exports.RAIDERS_ONLY_RULE = exports.POLLUTION_RULE = exports.CLEAR_CAPTURED_BUILD_RULE = exports.REVALIDATE_BUILDS_RULE = exports.RANSOM_RULE = exports.HYDRO_PLANT_SITE_RULE = void 0;
 /** A Hydro Plant may be built with Mountains or a River on or next to the city's square. */
 exports.HYDRO_PLANT_SITE_RULE = 'civ1-enhanced:city/build/hydro-plant-site';
 /** A barbarian leader killed by a civilization pays it his ransom, however he dies. */
@@ -25,4 +25,6 @@ exports.STEAL_RULE = 'civ1-enhanced:unit/technology-stolen/steal';
 exports.HALVE_CITIES_RULE = 'civ1-enhanced:unit/detonated/halve-cities';
 /** A unit that changes sides keeps its veteran status, and otherwise arrives as a new unit would. */
 exports.KEEP_VETERAN_RULE = 'civ1-enhanced:unit/transferred/keep-veteran';
+/** A city of size 1 doesn't complete Settlers until it is size 2. */
+exports.SETTLERS_WAIT_RULE = 'civ1-enhanced:city/hold/settlers-until-size-two';
 //# sourceMappingURL=RuleIds.js.map

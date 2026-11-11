@@ -29,3 +29,6 @@ export declare const HALVE_CITIES_RULE =
 /** A unit that changes sides keeps its veteran status, and otherwise arrives as a new unit would. */
 export declare const KEEP_VETERAN_RULE =
   'civ1-enhanced:unit/transferred/keep-veteran';
+/** A city of size 1 doesn't complete Settlers until it is size 2. */
+export declare const SETTLERS_WAIT_RULE =
+  'civ1-enhanced:city/hold/settlers-until-size-two';

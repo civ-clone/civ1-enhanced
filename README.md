@@ -80,3 +80,14 @@ switching those sets off there means no pollution and no uprisings at all, and t
   `civ1-enhanced:unit/transferred/keep-veteran` lets a unit that changes sides, bribed or with a city, keep its veteran
   status, through `civ1-unit`'s `lib/startAfresh`; it is still unfortified, with no moves and its fuel full. Supersedes
   `civ1-unit:unit/transferred/start-afresh`, which, as v474.05, starts it afresh as a new unit, no veteran.
+- `civ1-enhanced:settlers-wait-for-size-two` (`SETTLERS_WAIT_FOR_SIZE_TWO`), on to start with:
+  `civ1-enhanced:city/hold/settlers-until-size-two` holds Settlers in a city of size 1 until it is size 2, at every
+  level and however many cities its player has (civ-clone/web-renderer#959): the build stays chosen, its shields go on
+  adding up, and it is completed the first turn the city is size 2, which the Settlers take it back to. A city that
+  can never grow goes on adding shields to a build it can't finish. A `Hold` rule (`@civ-clone/core-city-build`), so
+  `CityBuild#held()` gives its id from the moment a size-1 city chooses Settlers, before they are paid for, until it
+  is size 2. Supersedes `civ1-unit:city/hold/chieftain-settlers`, v474.05's, which holds them only on Chieftain; on
+  the other levels v474.05 builds them, the player's only city keeping its citizen and any other removed, the
+  Settlers staying on its square (`civ1-unit`'s `city/building-complete/settlers-shrink-city`, which never sees a
+  size-1 city while this set is on). Before this set, a size-1 city was destroyed by its Settlers, which went with it,
+  at every level.

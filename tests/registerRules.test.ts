@@ -10,6 +10,7 @@ import {
   OBSOLETE_BUILDS,
   POLLUTION_IN_EVERY_CITY,
   SDI_DEFENSE_SPARES_CITIES,
+  SETTLERS_WAIT_FOR_SIZE_TWO,
   UNITED_NATIONS_STOPS_COMPUTER_WARS,
 } from '../RuleSets';
 // The Civ1 rules this package's sets change, and the rules they change them with (civ-clone/web-renderer#954).
@@ -28,10 +29,12 @@ import {
   RAIDERS_ONLY_RULE,
   RANSOM_RULE,
   REVALIDATE_BUILDS_RULE,
+  SETTLERS_WAIT_RULE,
   STEAL_RULE,
   UNITED_NATIONS_PACIFIED_RULE,
 } from '../RuleIds';
 import {
+  CHIEFTAIN_SETTLERS_RULE as CIV1_CHIEFTAIN_SETTLERS,
   HALVE_CITIES_RULE as CIV1_HALVE_CITIES,
   START_AFRESH_RULE as CIV1_START_AFRESH,
   STEAL_RULE as CIV1_STEAL,
@@ -61,6 +64,7 @@ const replacements: [string, string, string][] = [
     UNITED_NATIONS_PACIFIED_RULE,
   ],
   [EVEN_ADVANCE_STEALING, CIV1_STEAL, STEAL_RULE],
+  [SETTLERS_WAIT_FOR_SIZE_TWO, CIV1_CHIEFTAIN_SETTLERS, SETTLERS_WAIT_RULE],
 ];
 
 // Each new variant that takes the place of a Civ1 rule, the rule it takes the place of, and its own: all off to start
@@ -80,7 +84,7 @@ describe('registerRules', (): void => {
     expect((): void => register(game)).not.to.throw();
   });
 
-  it('should hold its eleven sets under one parent, with the ids exported', (): void => {
+  it('should hold its twelve sets under one parent, with the ids exported', (): void => {
     const game = loadGame();
 
     expect(ENHANCED).to.equal('civ1-enhanced');
@@ -109,6 +113,9 @@ describe('registerRules', (): void => {
     expect(DEFECTORS_STAY_VETERAN).to.equal(
       'civ1-enhanced:defectors-stay-veteran'
     );
+    expect(SETTLERS_WAIT_FOR_SIZE_TWO).to.equal(
+      'civ1-enhanced:settlers-wait-for-size-two'
+    );
     expect(game.ruleSets.get(ENHANCED)!.memberIds()).to.eql([
       HYDRO_PLANT_SITE,
       BARBARIAN_LEADER_RANSOM,
@@ -121,6 +128,7 @@ describe('registerRules', (): void => {
       EVEN_ADVANCE_STEALING,
       SDI_DEFENSE_SPARES_CITIES,
       DEFECTORS_STAY_VETERAN,
+      SETTLERS_WAIT_FOR_SIZE_TWO,
     ]);
     expect(game.ruleSets.get(HYDRO_PLANT_SITE)!.supersedes()).to.eql([
       CIV1_HYDRO_PLANT_SITE,
@@ -157,7 +165,7 @@ describe('registerRules', (): void => {
     expect(game.ruleSets.choices()).to.eql([]);
   });
 
-  it('should show the parent as mixed, and leave exactly the v474.05 rules running for all eleven when it is switched off', (): void => {
+  it('should show the parent as mixed, and leave exactly the v474.05 rules running for all twelve when it is switched off', (): void => {
     const game = loadGame();
 
     expect(game.ruleSets.state(ENHANCED)).to.equal('mixed');
@@ -209,6 +217,7 @@ describe('registerRules', (): void => {
       CIV1_STEAL,
       CIV1_HALVE_CITIES,
       CIV1_START_AFRESH,
+      CIV1_CHIEFTAIN_SETTLERS,
     ]);
     superseded.forEach((id: string): void => {
       expect(game.rules.getById(id), id).not.to.be.null;
@@ -294,6 +303,7 @@ describe('registerRules', (): void => {
     game.ruleSets.set(CAPTURED_CITY_BUILD, false);
     game.ruleSets.set(BARBARIAN_CITY_BUILDS, false);
     game.ruleSets.set(EVEN_ADVANCE_STEALING, false);
+    game.ruleSets.set(SETTLERS_WAIT_FOR_SIZE_TWO, false);
     // One of the two that start off.
     game.ruleSets.set(SDI_DEFENSE_SPARES_CITIES, true);
 
@@ -307,6 +317,7 @@ describe('registerRules', (): void => {
       { id: BARBARIAN_CITY_BUILDS, value: false },
       { id: EVEN_ADVANCE_STEALING, value: false },
       { id: SDI_DEFENSE_SPARES_CITIES, value: true },
+      { id: SETTLERS_WAIT_FOR_SIZE_TWO, value: false },
     ]);
 
     const restored = loadGame();
@@ -334,6 +345,8 @@ describe('registerRules', (): void => {
     expect(enabled(restored, HALVE_CITIES_RULE)).true;
     expect(enabled(restored, CIV1_START_AFRESH)).true;
     expect(enabled(restored, KEEP_VETERAN_RULE)).false;
+    expect(enabled(restored, CIV1_CHIEFTAIN_SETTLERS)).true;
+    expect(enabled(restored, SETTLERS_WAIT_RULE)).false;
     expect(restored.ruleSets.validate()).to.eql([]);
   });
 
@@ -356,6 +369,7 @@ describe('registerRules', (): void => {
       { id: BARBARIAN_UPRISINGS, value: false },
       { id: UNITED_NATIONS_STOPS_COMPUTER_WARS, value: false },
       { id: EVEN_ADVANCE_STEALING, value: false },
+      { id: SETTLERS_WAIT_FOR_SIZE_TWO, value: false },
     ]);
     expect(restored.ruleSets.restore(choices)).to.eql([]);
     expect(restored.ruleSets.state(ENHANCED)).to.equal('off');

@@ -24,6 +24,10 @@ const pacified_1 = require("./Rules/Player/pacified");
 const detonated_1 = require("./Rules/Unit/detonated");
 const technologyStolen_1 = require("./Rules/Unit/technologyStolen");
 const transferred_1 = require("./Rules/Unit/transferred");
+// civ-clone/web-renderer#959
+const RuleSets_3 = require("./RuleSets");
+const RuleIds_8 = require("./RuleIds");
+const hold_1 = require("./Rules/City/hold");
 const register = (game) => {
     // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
     //  rules running. The sets before their rules, so each rule is switched as it arrives: the Hydro Plant's starts off.
@@ -37,10 +41,16 @@ const register = (game) => {
     // Only the human's capture: v474.05 already has a computer player choose again, as `civ1-city`'s rule does.
     new RuleSet_1.default(RuleSets_1.CAPTURED_CITY_BUILD, { supersedes: [RuleIds_4.KEEP_BUILD_RULE] }, RuleIds_1.CLEAR_CAPTURED_BUILD_RULE), new RuleSet_1.default(RuleSets_1.POLLUTION_IN_EVERY_CITY, { supersedes: [RuleIds_2.POLLUTION_RULE] }, RuleIds_1.POLLUTION_RULE), new RuleSet_1.default(RuleSets_1.BARBARIAN_CITY_BUILDS, { supersedes: [RuleIds_3.RAIDERS_ONLY_RULE] }, RuleIds_1.RAIDERS_ONLY_RULE), new RuleSet_1.default(RuleSets_1.BARBARIAN_UPRISINGS, { supersedes: [RuleIds_3.LAND_UPRISING_RULE] }, RuleIds_1.LAND_UPRISING_RULE), 
     // civ-clone/web-renderer#960: two as play was, and two new, off to start with.
-    new RuleSet_1.default(RuleSets_2.UNITED_NATIONS_STOPS_COMPUTER_WARS, { supersedes: [RuleIds_7.UNITED_NATIONS_PACIFIED_RULE] }, RuleIds_5.UNITED_NATIONS_PACIFIED_RULE), new RuleSet_1.default(RuleSets_2.EVEN_ADVANCE_STEALING, { supersedes: [RuleIds_6.STEAL_RULE] }, RuleIds_5.STEAL_RULE), new RuleSet_1.default(RuleSets_2.SDI_DEFENSE_SPARES_CITIES, { enabled: false, supersedes: [RuleIds_6.HALVE_CITIES_RULE] }, RuleIds_5.HALVE_CITIES_RULE), new RuleSet_1.default(RuleSets_2.DEFECTORS_STAY_VETERAN, { enabled: false, supersedes: [RuleIds_6.START_AFRESH_RULE] }, RuleIds_5.KEEP_VETERAN_RULE)));
+    new RuleSet_1.default(RuleSets_2.UNITED_NATIONS_STOPS_COMPUTER_WARS, { supersedes: [RuleIds_7.UNITED_NATIONS_PACIFIED_RULE] }, RuleIds_5.UNITED_NATIONS_PACIFIED_RULE), new RuleSet_1.default(RuleSets_2.EVEN_ADVANCE_STEALING, { supersedes: [RuleIds_6.STEAL_RULE] }, RuleIds_5.STEAL_RULE), new RuleSet_1.default(RuleSets_2.SDI_DEFENSE_SPARES_CITIES, { enabled: false, supersedes: [RuleIds_6.HALVE_CITIES_RULE] }, RuleIds_5.HALVE_CITIES_RULE), new RuleSet_1.default(RuleSets_2.DEFECTORS_STAY_VETERAN, { enabled: false, supersedes: [RuleIds_6.START_AFRESH_RULE] }, RuleIds_5.KEEP_VETERAN_RULE), 
+    // civ-clone/web-renderer#959. On Chieftain, v474.05's rule holds the same build in a smaller set of cities:
+    //  superseded, so a held build gives one reason, this one. With it on, `civ1-unit`'s rule that removes a size-1
+    //  city for its Settlers is never reached, so it needn't be superseded too.
+    new RuleSet_1.default(RuleSets_3.SETTLERS_WAIT_FOR_SIZE_TWO, { supersedes: [RuleIds_6.CHIEFTAIN_SETTLERS_RULE] }, RuleIds_8.SETTLERS_WAIT_RULE)));
     game.rules.register(...(0, build_1.default)(game), ...(0, captured_1.default)(game), ...(0, processYield_1.default)(game), ...(0, researchComplete_1.default)(game.cities, game.cityBuilds), ...(0, start_1.default)(game), ...(0, destroyed_1.default)(game), 
     // civ-clone/web-renderer#960
-    ...(0, pacified_1.default)(game), ...(0, technologyStolen_1.default)(game), ...(0, detonated_1.default)(game), ...(0, transferred_1.default)(game));
+    ...(0, pacified_1.default)(game), ...(0, technologyStolen_1.default)(game), ...(0, detonated_1.default)(game), ...(0, transferred_1.default)(game), 
+    // civ-clone/web-renderer#959
+    ...(0, hold_1.default)(game));
     // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the
     //  civilopedia and the reasons a city can't build something follow the rule with the entry's id.
     game.requirements.add(null, ...Requirements_1.describedRequirements);

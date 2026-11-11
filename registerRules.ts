@@ -50,6 +50,7 @@ import {
   UNITED_NATIONS_PACIFIED_RULE,
 } from './RuleIds';
 import {
+  CHIEFTAIN_SETTLERS_RULE as CIV1_CHIEFTAIN_SETTLERS_RULE,
   HALVE_CITIES_RULE as CIV1_HALVE_CITIES_RULE,
   START_AFRESH_RULE as CIV1_START_AFRESH_RULE,
   STEAL_RULE as CIV1_STEAL_RULE,
@@ -59,6 +60,10 @@ import playerPacified from './Rules/Player/pacified';
 import unitDetonated from './Rules/Unit/detonated';
 import unitTechnologyStolen from './Rules/Unit/technologyStolen';
 import unitTransferred from './Rules/Unit/transferred';
+// civ-clone/web-renderer#959
+import { SETTLERS_WAIT_FOR_SIZE_TWO } from './RuleSets';
+import { SETTLERS_WAIT_RULE } from './RuleIds';
+import cityHold from './Rules/City/hold';
 
 export const register = (game: Game): void => {
   // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
@@ -123,6 +128,14 @@ export const register = (game: Game): void => {
         DEFECTORS_STAY_VETERAN,
         { enabled: false, supersedes: [CIV1_START_AFRESH_RULE] },
         KEEP_VETERAN_RULE
+      ),
+      // civ-clone/web-renderer#959. On Chieftain, v474.05's rule holds the same build in a smaller set of cities:
+      //  superseded, so a held build gives one reason, this one. With it on, `civ1-unit`'s rule that removes a size-1
+      //  city for its Settlers is never reached, so it needn't be superseded too.
+      new RuleSet(
+        SETTLERS_WAIT_FOR_SIZE_TWO,
+        { supersedes: [CIV1_CHIEFTAIN_SETTLERS_RULE] },
+        SETTLERS_WAIT_RULE
       )
     )
   );
@@ -138,7 +151,9 @@ export const register = (game: Game): void => {
     ...playerPacified(game),
     ...unitTechnologyStolen(game),
     ...unitDetonated(game),
-    ...unitTransferred(game)
+    ...unitTransferred(game),
+    // civ-clone/web-renderer#959
+    ...cityHold(game)
   );
 
   // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the
