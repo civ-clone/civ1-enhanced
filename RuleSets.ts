@@ -69,3 +69,10 @@ export const SDI_DEFENSE_SPARES_CITIES =
  * while it is on. Off to start with.
  */
 export const DEFECTORS_STAY_VETERAN = 'civ1-enhanced:defectors-stay-veteran';
+
+/**
+ * A city of size 1 holds Settlers until it is size 2, at every level, rather than being removed for them
+ * (civ-clone/web-renderer#959). Takes the place of `civ1-unit`'s Chieftain rule while it is on.
+ */
+export const SETTLERS_WAIT_FOR_SIZE_TWO =
+  'civ1-enhanced:settlers-wait-for-size-two';
