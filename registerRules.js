@@ -3,13 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.register = void 0;
 const RuleSets_1 = require("./RuleSets");
 const RuleIds_1 = require("./RuleIds");
-const core_game_1 = require("@civ-clone/core-game");
 const RuleIds_2 = require("@civ-clone/civ1-city-improvement/RuleIds");
 const RuleIds_3 = require("@civ-clone/civ1-barbarians/RuleIds");
+const core_game_1 = require("@civ-clone/core-game");
+const RuleIds_4 = require("@civ-clone/civ1-city/RuleIds");
 const RuleSet_1 = require("@civ-clone/core-rule/RuleSet");
 const build_1 = require("./Rules/City/build");
+const captured_1 = require("./Rules/City/captured");
+const processYield_1 = require("./Rules/City/processYield");
 const Requirements_1 = require("./Requirements");
 const researchComplete_1 = require("./Rules/Player/researchComplete");
+const start_1 = require("./Rules/Turn/start");
 const destroyed_1 = require("./Rules/Unit/destroyed");
 const register = (game) => {
     // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
@@ -20,8 +24,10 @@ const register = (game) => {
         supersedes: [RuleIds_2.HYDRO_PLANT_SITE_RULE],
     }, RuleIds_1.HYDRO_PLANT_SITE_RULE), new RuleSet_1.default(RuleSets_1.BARBARIAN_LEADER_RANSOM, { supersedes: [RuleIds_3.RANSOM_RULE] }, RuleIds_1.RANSOM_RULE), 
     // A rule added to Civ1's, so nothing to supersede: switched off, v474.05's play is what is left.
-    new RuleSet_1.default(RuleSets_1.OBSOLETE_BUILDS, RuleIds_1.REVALIDATE_BUILDS_RULE)));
-    game.rules.register(...(0, build_1.default)(), ...(0, researchComplete_1.default)(game.cities, game.cityBuilds), ...(0, destroyed_1.default)(game));
+    new RuleSet_1.default(RuleSets_1.OBSOLETE_BUILDS, RuleIds_1.REVALIDATE_BUILDS_RULE), 
+    // Only the human's capture: v474.05 already has a computer player choose again, as `civ1-city`'s rule does.
+    new RuleSet_1.default(RuleSets_1.CAPTURED_CITY_BUILD, { supersedes: [RuleIds_4.KEEP_BUILD_RULE] }, RuleIds_1.CLEAR_CAPTURED_BUILD_RULE), new RuleSet_1.default(RuleSets_1.POLLUTION_IN_EVERY_CITY, { supersedes: [RuleIds_2.POLLUTION_RULE] }, RuleIds_1.POLLUTION_RULE), new RuleSet_1.default(RuleSets_1.BARBARIAN_CITY_BUILDS, { supersedes: [RuleIds_3.RAIDERS_ONLY_RULE] }, RuleIds_1.RAIDERS_ONLY_RULE), new RuleSet_1.default(RuleSets_1.BARBARIAN_UPRISINGS, { supersedes: [RuleIds_3.LAND_UPRISING_RULE] }, RuleIds_1.LAND_UPRISING_RULE)));
+    game.rules.register(...(0, build_1.default)(game), ...(0, captured_1.default)(game), ...(0, processYield_1.default)(game), ...(0, researchComplete_1.default)(game.cities, game.cityBuilds), ...(0, start_1.default)(game), ...(0, destroyed_1.default)(game));
     // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the
     //  civilopedia and the reasons a city can't build something follow the rule with the entry's id.
     game.requirements.add(null, ...Requirements_1.describedRequirements);

@@ -15,6 +15,11 @@ build rather than leaving both rules running. Its own rule ids are exported the 
 
 ## Rule sets
 
+Where a rule below says "the human", that is every player whose seat is not played by the computer (`civ1-difficulty`'s
+`isHuman`: a player with a client, none of them an `AIClient`), each counting as v474.05's one human. In a game with
+no such seat (all computer players, or a game only watched), the v474.05 pollution and uprising rules never fire, so
+switching those sets off there means no pollution and no uprisings at all.
+
 - `civ1-enhanced:hydro-plant-site` (`HYDRO_PLANT_SITE`), off to start with: `civ1-enhanced:city/build/hydro-plant-site`
   lets a city build a Hydro Plant with Mountains or a River on its own square as well as next to it, as the manual's
   "on or near" has it. Supersedes `civ1-city-improvement:city/build/hydro-plant-site`, which, as v474.05, looks only
@@ -29,3 +34,22 @@ build rather than leaving both rules running. Its own rule ids are exported the 
   `civ1-enhanced:player/research-complete/revalidate-builds` drops what a city is building once a discovery makes it
   obsolete, as Gunpowder does Spearman, and its player chooses again (civ-clone/web-renderer#693). A rule added to
   Civ1's, so it supersedes nothing: switched off, a city finishes the build, as v474.05's does.
+- `civ1-enhanced:captured-city-build` (`CAPTURED_CITY_BUILD`), on to start with:
+  `civ1-enhanced:city/captured/clear-build` clears what a city the human captures was building, so the human chooses
+  at their own price (civ-clone/web-renderer#670, #500), through `civ1-city`'s `lib/capturedBuild`. Supersedes
+  `civ1-city:city/captured/keep-build`, which, as v474.05, leaves the human building the item, from no shields, at
+  their own price. A computer player that takes a city chooses again either way, as v474.05's does
+  (`civ1-city:city/captured/clear-build`).
+- `civ1-enhanced:pollution-in-every-city` (`POLLUTION_IN_EVERY_CITY`), on to start with:
+  `civ1-enhanced:city/process-yield/pollution` rolls for pollution in every city (civ-clone/web-renderer#32), through
+  `civ1-city-improvement`'s `lib/pollute`. Supersedes `civ1-city-improvement:city/process-yield/pollution`, which, as
+  v474.05, rolls only in the human's cities.
+- `civ1-enhanced:barbarian-city-builds` (`BARBARIAN_CITY_BUILDS`), on to start with:
+  `civ1-enhanced:city/build/raiders-only` lets a barbarian city build any land unit that attacks, other than Settlers,
+  Diplomats and Caravans, that at least two civilizations can build (civ-clone/web-renderer#27). Supersedes
+  `civ1-barbarians:city/build/raiders-only`, which, as v474.05, builds a Warrior while the barbarians have no unit,
+  then Swordmen, and Knights once anyone has Explosives.
+- `civ1-enhanced:barbarian-uprisings` (`BARBARIAN_UPRISINGS`), on to start with:
+  `civ1-enhanced:turn/start/land-uprising` lets an uprising break out near any civilization's city
+  (civ-clone/web-renderer#27), through `civ1-barbarians`' `lib/landUprising`, so `barbarians:uprising` is emitted as
+  before. Supersedes `civ1-barbarians:turn/start/land-uprising`, which, as v474.05, lets only the human's cities rise.

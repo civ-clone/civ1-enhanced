@@ -19,8 +19,15 @@
   "devDependencies": {
     "@civ-clone/base-city-yield-gold": "^0.1.1",
     "@civ-clone/base-science-advance-bronzeworking": "^0.1.0",
+    "@civ-clone/base-science-advance-chivalry": "^0.1.0",
+    "@civ-clone/base-science-advance-explosives": "^0.1.0",
     "@civ-clone/base-science-advance-gunpowder": "^0.1.0",
     "@civ-clone/base-science-advance-writing": "^0.1.0",
+    "@civ-clone/core-ai-client": "^0.1.0",
+    "@civ-clone/core-city-growth": "^0.1.6",
+    "@civ-clone/core-client": "^0.1.0",
+    "@civ-clone/core-government": "^0.1.6",
+    "@civ-clone/core-player-world": "^0.1.14",
     "@civ-clone/core-treasury": "^0.1.9",
     "@civ-clone/simple-world-generator": "^0.1.6",
     "@types/chai": "^4.0.0",
@@ -35,7 +42,9 @@
   "dependencies": {
     "@civ-clone/base-civilization-barbarian": "^0.1.1",
     "@civ-clone/civ1-barbarians": "github:civ-clone/civ1-barbarians",
+    "@civ-clone/civ1-city": "github:civ-clone/civ1-city",
     "@civ-clone/civ1-city-improvement": "github:civ-clone/civ1-city-improvement",
+    "@civ-clone/civ1-difficulty": "github:civ-clone/civ1-difficulty",
     "@civ-clone/civ1-unit": "github:civ-clone/civ1-unit",
     "@civ-clone/civ1-world": "github:civ-clone/civ1-world",
     "@civ-clone/core-city": "^0.1.24",
@@ -46,7 +55,9 @@
     "@civ-clone/core-requirement": "^0.1.3",
     "@civ-clone/core-rule": "^0.1.9",
     "@civ-clone/core-science": "^0.1.9",
+    "@civ-clone/core-turn-based-game": "^0.1.9",
     "@civ-clone/core-unit": "^0.1.29",
-    "@civ-clone/core-world": "^0.1.22"
+    "@civ-clone/core-world": "^0.1.22",
+    "@civ-clone/core-yield": "^0.1.5"
   }
 }
