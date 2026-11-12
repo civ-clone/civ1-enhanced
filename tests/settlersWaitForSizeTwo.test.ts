@@ -20,7 +20,7 @@ import PlayerResearch from '@civ-clone/core-science/PlayerResearch';
 import PlayerWorld from '@civ-clone/core-player-world/PlayerWorld';
 import { Production } from '@civ-clone/civ1-world/Yields';
 import { SETTLERS_WAIT_RULE } from '../RuleIds';
-import { Settlers } from '@civ-clone/civ1-unit/Units';
+import { Settlers, Warrior } from '@civ-clone/civ1-unit/Units';
 import Unit from '@civ-clone/core-unit/Unit';
 import { expect } from 'chai';
 
@@ -187,6 +187,57 @@ describe('Settlers in a city of size 1 (civ-clone/web-renderer#959)', (): void =
 
       expect(cityBuild.held()).eql([]);
       expect(cityBuild.building()!.item()).equal(Settlers);
+    });
+
+    it('should say they would wait before they are chosen, beside them in a build menu or queue (civ-clone/web-renderer#970)', async (): Promise<void> => {
+      const { cityBuild, cityGrowth, game } = await setUp();
+
+      game.availableCityBuildItems.register(
+        Warrior as unknown as typeof Buildable
+      );
+      cityBuild.build(Warrior as unknown as typeof Buildable);
+
+      expect(cityBuild.held()).eql([]);
+      expect(cityBuild.held(Settlers as unknown as typeof Buildable)).eql([
+        SETTLERS_WAIT_RULE,
+      ]);
+
+      cityBuild.cancel();
+
+      expect(cityBuild.held(Settlers as unknown as typeof Buildable)).eql([
+        SETTLERS_WAIT_RULE,
+      ]);
+
+      cityGrowth.grow();
+
+      expect(cityBuild.held(Settlers as unknown as typeof Buildable)).eql([]);
+    });
+
+    it('should say once that they are waiting, when they are paid for (civ-clone/web-renderer#970)', async (): Promise<void> => {
+      const { cityBuild, game, produce } = await setUp(),
+        // The build's id, not the build: see `ids`.
+        events: [string, unknown, (string | null)[]][] = [];
+
+      game.engine.on(
+        'city:building-held',
+        (
+          heldBuild: CityBuild,
+          item: unknown,
+          held: (string | null)[]
+        ): void => {
+          events.push([heldBuild.id(), item, held]);
+        }
+      );
+
+      produce(1);
+
+      expect(events).eql([]);
+
+      produce();
+      produce(1);
+      produce(1);
+
+      expect(events).eql([[cityBuild.id(), Settlers, [SETTLERS_WAIT_RULE]]]);
     });
 
     it('should complete them once the city is size 2, which they take it back to', async (): Promise<void> => {
