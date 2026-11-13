@@ -22,10 +22,12 @@ import Player from '@civ-clone/core-player/Player';
 import PlayerResearch from '@civ-clone/core-science/PlayerResearch';
 import RuleRegistry from '@civ-clone/core-rule/RuleRegistry';
 import Unit from '@civ-clone/core-unit/Unit';
-import { availableToBarbarians } from '../Rules/City/build';
+import * as Units from '@civ-clone/civ1-unit/Units';
+import { availableToBarbarians, neverBarbarian } from '../Rules/City/build';
 import { expect } from 'chai';
 import { raidersOnlyRule } from '../Rules/City/build';
 import { requiredAdvanceFor } from '@civ-clone/civ1-unit/lib/requiredAdvances';
+import traits from '@civ-clone/civ1-unit/Rules/Unit/traits';
 import unitYields from '@civ-clone/civ1-unit/Rules/Unit/yield';
 
 // A barbarian city with a Horseman of theirs about, and two civilizations, in a game with civ1-unit's rules,
@@ -90,7 +92,8 @@ describe('what a barbarian city builds (civ-clone/web-renderer#954)', (): void =
     describe('availableToBarbarians', (): void => {
       const rules = new RuleRegistry();
 
-      rules.register(...unitYields(undefined, rules));
+      // civ1-unit's unit traits, registered first as in a game: which types found cities or are `NonCombatant`.
+      rules.register(...traits(), ...unitYields(undefined, rules));
 
       const research = new Map<Player, (typeof Chivalry)[]>(),
         players = {
@@ -185,6 +188,26 @@ describe('what a barbarian city builds (civ-clone/web-renderer#954)', (): void =
         expect(
           registry.process(Build, cityOf(civilization) as any, Warrior as any)
         ).to.have.length(0);
+      });
+
+      // The three it never builds were `=== Settlers || Diplomat || Caravan` before they were the types that found
+      //  cities or are `NonCombatant`: the same three of the 28.
+      it('never builds the same unit types as the class comparisons named', (): void => {
+        const UnitTypes = Object.values(Units) as unknown as (typeof Unit)[];
+
+        expect(UnitTypes).length(28);
+
+        UnitTypes.forEach((UnitType): void => {
+          expect(neverBarbarian(UnitType, rules), UnitType.name).equal(
+            UnitType === Settlers ||
+              UnitType === Diplomat ||
+              UnitType === Caravan
+          );
+        });
+
+        expect(
+          UnitTypes.filter((UnitType) => neverBarbarian(UnitType, rules))
+        ).length(3);
       });
     });
 

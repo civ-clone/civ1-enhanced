@@ -11,5 +11,7 @@ import Hold from '@civ-clone/core-city-build/Rules/Hold';
  * citizen, and any other is removed, the Settlers staying on its square (`civ1-unit`'s
  * `city/building-complete/settlers-shrink-city`, which never sees a size-1 city while this is on).
  */
-export declare const getRules: (game: Pick<Game, 'cityGrowth'>) => Hold[];
+export declare const getRules: (
+  game: Pick<Game, 'cityGrowth' | 'rules'>
+) => Hold[];
 export default getRules;

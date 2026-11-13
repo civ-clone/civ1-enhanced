@@ -17,7 +17,9 @@ const settlersInSizeOneCity_1 = require("@civ-clone/civ1-unit/lib/settlersInSize
  * `city/building-complete/settlers-shrink-city`, which never sees a size-1 city while this is on).
  */
 const getRules = (game) => [
-    new Hold_1.default(RuleIds_1.SETTLERS_WAIT_RULE, new Criterion_1.default((0, settlersInSizeOneCity_1.default)(game.cityGrowth))),
+    new Hold_1.default(RuleIds_1.SETTLERS_WAIT_RULE, 
+    // The game's rules, for which types `FoundsCities` (civ1-unit's `lib/settlersInSizeOneCity`).
+    new Criterion_1.default((0, settlersInSizeOneCity_1.default)(game.cityGrowth, game.rules))),
 ];
 exports.getRules = getRules;
 exports.default = exports.getRules;
