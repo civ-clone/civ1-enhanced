@@ -15,10 +15,11 @@ import settlersInSizeOneCity from '@civ-clone/civ1-unit/lib/settlersInSizeOneCit
  * citizen, and any other is removed, the Settlers staying on its square (`civ1-unit`'s
  * `city/building-complete/settlers-shrink-city`, which never sees a size-1 city while this is on).
  */
-export const getRules = (game: Pick<Game, 'cityGrowth'>): Hold[] => [
+export const getRules = (game: Pick<Game, 'cityGrowth' | 'rules'>): Hold[] => [
   new Hold(
     SETTLERS_WAIT_RULE,
-    new Criterion(settlersInSizeOneCity(game.cityGrowth))
+    // The game's rules, for which types `FoundsCities` (civ1-unit's `lib/settlersInSizeOneCity`).
+    new Criterion(settlersInSizeOneCity(game.cityGrowth, game.rules))
   ),
 ];
 

@@ -1,5 +1,4 @@
 import { Build, IBuildCriterion } from '@civ-clone/core-city-build/Rules/Build';
-import { Caravan, Diplomat, Settlers } from '@civ-clone/civ1-unit/Units';
 import { HYDRO_PLANT_SITE_RULE, RAIDERS_ONLY_RULE } from '../../RuleIds';
 import { Mountains, River } from '@civ-clone/civ1-world/Terrains';
 import Attack from '@civ-clone/core-unit/Yields/Attack';
@@ -7,16 +6,19 @@ import { BaseYield } from '@civ-clone/core-unit/Rules/Yield';
 import City from '@civ-clone/core-city/City';
 import Criterion from '@civ-clone/core-rule/Criterion';
 import Effect from '@civ-clone/core-rule/Effect';
+import FoundsCities from '@civ-clone/base-unit-trait-founds-cities/FoundsCities';
 import { Game } from '@civ-clone/core-game';
 import { HydroPlant } from '@civ-clone/civ1-city-improvement/CityImprovements';
 import { IConstructor } from '@civ-clone/core-registry/Registry';
 import { Land } from '@civ-clone/civ1-unit/Types';
+import NonCombatant from '@civ-clone/base-unit-trait-non-combatant/NonCombatant';
 import Player from '@civ-clone/core-player/Player';
 import { PlayerRegistry } from '@civ-clone/core-player/PlayerRegistry';
 import { PlayerResearchRegistry } from '@civ-clone/core-science/PlayerResearchRegistry';
 import { RuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
 import Tile from '@civ-clone/core-world/Tile';
 import Unit from '@civ-clone/core-unit/Unit';
+import { hasTrait } from '@civ-clone/core-unit/traits';
 import isBarbarian from '@civ-clone/base-civilization-barbarian/isBarbarian';
 import { requiredAdvanceFor } from '@civ-clone/civ1-unit/lib/requiredAdvances';
 
@@ -61,6 +63,17 @@ const baseAttack = (
 };
 
 /**
+ * Settlers, Diplomats and Caravans, which barbarians never build: the types that, in `ruleRegistry`, the game's rules,
+ * found cities or are `NonCombatant`.
+ */
+export const neverBarbarian = (
+  UnitType: typeof Unit,
+  ruleRegistry: RuleRegistry
+): boolean =>
+  hasTrait(UnitType, FoundsCities, ruleRegistry) ||
+  hasTrait(UnitType, NonCombatant, ruleRegistry);
+
+/**
  * Whether a barbarian city may build `Item`: a land unit that attacks, other than Settlers, a Diplomat or a Caravan,
  * that at least two civilizations know how to build (civ-clone/web-renderer#27, decision 3). Never a ship, an
  * aircraft or a missile (the barbarians' client moves land units and transports only), an improvement or a Wonder.
@@ -78,9 +91,7 @@ export const availableToBarbarians = (
   const UnitType = Item as unknown as typeof Unit;
 
   if (
-    UnitType === Settlers ||
-    UnitType === Diplomat ||
-    UnitType === Caravan ||
+    neverBarbarian(UnitType, ruleRegistry) ||
     baseAttack(UnitType, ruleRegistry) <= 0
   ) {
     return false;

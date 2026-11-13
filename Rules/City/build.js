@@ -1,16 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRules = exports.raidersOnlyRule = exports.availableToBarbarians = exports.CIVILIZATIONS_NEEDED = exports.hydroPlantSiteRule = void 0;
+exports.getRules = exports.raidersOnlyRule = exports.availableToBarbarians = exports.neverBarbarian = exports.CIVILIZATIONS_NEEDED = exports.hydroPlantSiteRule = void 0;
 const Build_1 = require("@civ-clone/core-city-build/Rules/Build");
-const Units_1 = require("@civ-clone/civ1-unit/Units");
 const RuleIds_1 = require("../../RuleIds");
 const Terrains_1 = require("@civ-clone/civ1-world/Terrains");
 const Attack_1 = require("@civ-clone/core-unit/Yields/Attack");
 const Yield_1 = require("@civ-clone/core-unit/Rules/Yield");
 const Criterion_1 = require("@civ-clone/core-rule/Criterion");
 const Effect_1 = require("@civ-clone/core-rule/Effect");
+const FoundsCities_1 = require("@civ-clone/base-unit-trait-founds-cities/FoundsCities");
 const CityImprovements_1 = require("@civ-clone/civ1-city-improvement/CityImprovements");
 const Types_1 = require("@civ-clone/civ1-unit/Types");
+const NonCombatant_1 = require("@civ-clone/base-unit-trait-non-combatant/NonCombatant");
+const traits_1 = require("@civ-clone/core-unit/traits");
 const isBarbarian_1 = require("@civ-clone/base-civilization-barbarian/isBarbarian");
 const requiredAdvances_1 = require("@civ-clone/civ1-unit/lib/requiredAdvances");
 /**
@@ -31,6 +33,13 @@ const baseAttack = (UnitType, ruleRegistry) => {
     return attack.value();
 };
 /**
+ * Settlers, Diplomats and Caravans, which barbarians never build: the types that, in `ruleRegistry`, the game's rules,
+ * found cities or are `NonCombatant`.
+ */
+const neverBarbarian = (UnitType, ruleRegistry) => (0, traits_1.hasTrait)(UnitType, FoundsCities_1.default, ruleRegistry) ||
+    (0, traits_1.hasTrait)(UnitType, NonCombatant_1.default, ruleRegistry);
+exports.neverBarbarian = neverBarbarian;
+/**
  * Whether a barbarian city may build `Item`: a land unit that attacks, other than Settlers, a Diplomat or a Caravan,
  * that at least two civilizations know how to build (civ-clone/web-renderer#27, decision 3). Never a ship, an
  * aircraft or a missile (the barbarians' client moves land units and transports only), an improvement or a Wonder.
@@ -40,9 +49,7 @@ const availableToBarbarians = (Item, playerRegistry, playerResearchRegistry, rul
         return false;
     }
     const UnitType = Item;
-    if (UnitType === Units_1.Settlers ||
-        UnitType === Units_1.Diplomat ||
-        UnitType === Units_1.Caravan ||
+    if ((0, exports.neverBarbarian)(UnitType, ruleRegistry) ||
         baseAttack(UnitType, ruleRegistry) <= 0) {
         return false;
     }

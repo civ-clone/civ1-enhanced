@@ -4,6 +4,7 @@ import { IConstructor } from '@civ-clone/core-registry/Registry';
 import { PlayerRegistry } from '@civ-clone/core-player/PlayerRegistry';
 import { PlayerResearchRegistry } from '@civ-clone/core-science/PlayerResearchRegistry';
 import { RuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
+import Unit from '@civ-clone/core-unit/Unit';
 /**
  * A Hydro Plant is built with Mountains or a River on or next to the city's square, as the manual has it ("on or
  * near"). v474.05 looks only at the eight squares around the city, and not its own (`civ1-city-improvement`'s
@@ -12,6 +13,14 @@ import { RuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
  */
 export declare const hydroPlantSiteRule: () => Build;
 export declare const CIVILIZATIONS_NEEDED = 2;
+/**
+ * Settlers, Diplomats and Caravans, which barbarians never build: the types that, in `ruleRegistry`, the game's rules,
+ * found cities or are `NonCombatant`.
+ */
+export declare const neverBarbarian: (
+  UnitType: typeof Unit,
+  ruleRegistry: RuleRegistry
+) => boolean;
 /**
  * Whether a barbarian city may build `Item`: a land unit that attacks, other than Settlers, a Diplomat or a Caravan,
  * that at least two civilizations know how to build (civ-clone/web-renderer#27, decision 3). Never a ship, an
