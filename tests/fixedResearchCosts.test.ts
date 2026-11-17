@@ -18,6 +18,7 @@ import { COST_RULE as CIV1_COST_RULE } from '@civ-clone/civ1-science/RuleIds';
 import { FIXED_RESEARCH_COSTS } from '../RuleSets';
 import { Game } from '@civ-clone/core-game/Game';
 import Player from '@civ-clone/core-player/Player';
+import PlayerResearch from '@civ-clone/core-science/PlayerResearch';
 import Turn from '@civ-clone/core-turn-based-game/Turn';
 import { TIERED_COST_RULE } from '../RuleIds';
 import Year from '@civ-clone/core-game-year/Year';
@@ -28,7 +29,8 @@ import researchTiers from '../ResearchTiers';
 import { tierOf } from '@civ-clone/base-science-research-tiered-cost/lib/tiers';
 
 type Setting = {
-  on?: boolean;
+  // `null` leaves the set as it starts.
+  on?: boolean | null;
   Level?: typeof Prince;
   human?: boolean;
   known?: (typeof Advance)[];
@@ -55,7 +57,9 @@ const setUp = ({
     // civ1-science's own, made as the player is added.
     playerResearch = game.playerResearch.getByPlayer(player);
 
-  game.ruleSets.set(FIXED_RESEARCH_COSTS, on);
+  if (on !== null) {
+    game.ruleSets.set(FIXED_RESEARCH_COSTS, on);
+  }
   game.difficulty.set(Level);
   game.clients.register(human ? new Client(player) : new AIClient(player));
   known.forEach((Known) => playerResearch.addAdvance(Known));
@@ -81,14 +85,44 @@ const advancesOf = (game: Game): (typeof Advance)[] =>
 
 describe('fixed research costs (civ-clone/web-renderer#1072)', (): void => {
   it("should be off to start with, leaving civ1-science's cost by advances known", (): void => {
-    const { game, cost } = setUp({ on: true });
+    const { game, cost } = setUp({ on: null });
+
+    expect(game.ruleSets.state(FIXED_RESEARCH_COSTS)).to.equal('off');
+    // Prince, BC, the human's first advance: 1 × max(10, 11 - 1).
+    expect(cost(TheRepublic)).to.eql({ rules: [CIV1_COST_RULE], cost: 10 });
+  });
+
+  it("should give civ1-science's cost back when switched off again", (): void => {
+    const { game, cost } = setUp();
 
     game.ruleSets.set(FIXED_RESEARCH_COSTS, false);
 
-    expect(game.ruleSets.state(FIXED_RESEARCH_COSTS)).to.equal('off');
-    expect(loadGame().ruleSets.state(FIXED_RESEARCH_COSTS)).to.equal('off');
-    // Prince, BC, the human's first advance: 1 × max(10, 11 - 1).
     expect(cost(TheRepublic)).to.eql({ rules: [CIV1_COST_RULE], cost: 10 });
+  });
+
+  it('should not keep weights worked out before any advance needs another', (): void => {
+    const game = loadGame([], pluginOrder, {
+        rng: (): number => 0,
+        turn: { value: (): number => 0 } as unknown as Turn,
+      }),
+      player = new Player(game.rules);
+
+    game.ruleSets.set(FIXED_RESEARCH_COSTS, true);
+    // civ1-science's advances, but not yet its entries or rules: only this package's cost rule runs.
+    game.advances.register(TheRepublic);
+
+    const research = new PlayerResearch(player, game.advances, game.rules);
+
+    game.clients.register(new Client(player));
+    game.difficulty.set(Prince);
+    game.playerResearch.register(research);
+
+    expect(game.rules.process(Cost, TheRepublic, research)[0]).to.equal(40);
+
+    require('@civ-clone/civ1-science/registerRules').register(game);
+    game.advances.register(Alphabet, CodeOfLaws, Writing, Literacy);
+
+    expect(game.rules.process(Cost, TheRepublic, research)[0]).to.equal(230);
   });
 
   describe('the tiers', (): void => {

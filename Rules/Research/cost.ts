@@ -34,28 +34,38 @@ export const getRules = (game: ResearchCostGame): Cost[] => {
       year: game.year,
     },
     // Read from the game's advances and `requires` entries when the first cost is asked for: this package is loaded
-    //  before `civ1-science`, so they aren't there yet when it registers, and a plugin's changes to them count.
+    //  before `civ1-science`, so they aren't there yet when it registers, and a plugin's changes to them count. Kept
+    //  only once some advance needs another, so a cost asked for before the entries are added isn't kept for good.
     weights = (() => {
       let known: Map<typeof Advance, number> | null = null;
 
-      return (): Map<typeof Advance, number> =>
-        (known ??= weightsFor(
-          prerequisiteCounts(
+      return (): Map<typeof Advance, number> => {
+        if (known !== null) {
+          return known;
+        }
+
+        const counts = prerequisiteCounts(
             game.advances.filter(
               (AdvanceType: typeof Advance): boolean => !AdvanceType.repeatable
             ),
             game.requirements.entries()
           ),
-          researchTiers
-        ));
+          found = weightsFor(counts, researchTiers);
+
+        if ([...counts.values()].some((count: number): boolean => count > 0)) {
+          known = found;
+        }
+
+        return found;
+      };
     })();
 
   return [
     new Cost(
       // The same rate as `civ1-science`'s rule (difficulty, catch-up, doubled from AD), times the advance's weight in
       //  place of the advances known. Without the human's floor of 11 - advances a step: the first tier's weight
-      //  already keeps the first advances from costing next to nothing, and the floor would make the very first cost
-      //  40 at Chieftain, not 10. An advance with no tier (Future Technology) costs what it does by `civ1-science`'s.
+      //  already keeps the first advances from costing next to nothing, and keeping the floor too would make the first
+      //  advance cost 4 × 10 = 40 at Chieftain, where civ1-science's costs 10 and this one costs 4 × 6 = 24. An advance with no tier (Future Technology) costs what it does by `civ1-science`'s.
       TIERED_COST_RULE,
       new Effect((CostAdvance: typeof Advance, playerResearch) =>
         tieredCost(
