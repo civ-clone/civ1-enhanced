@@ -2,7 +2,7 @@
 // The ids of the rule sets this package registers (civ-clone/web-renderer#954), for whatever switches them. Each is a
 //  departure from v474.05, and all are beneath `ENHANCED`, so a game can switch them as one.
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RESEARCH_COST_BY_AGE = exports.AGES = exports.FIXED_RESEARCH_COSTS = exports.SETTLERS_WAIT_FOR_SIZE_TWO = exports.DEFECTORS_STAY_VETERAN = exports.SDI_DEFENSE_SPARES_CITIES = exports.EVEN_ADVANCE_STEALING = exports.UNITED_NATIONS_STOPS_COMPUTER_WARS = exports.BARBARIAN_UPRISINGS = exports.BARBARIAN_CITY_BUILDS = exports.POLLUTION_IN_EVERY_CITY = exports.CAPTURED_CITY_BUILD = exports.OBSOLETE_BUILDS = exports.BARBARIAN_LEADER_RANSOM = exports.HYDRO_PLANT_SITE = exports.ENHANCED = void 0;
+exports.STARTING_ADVANCES_COUNT = exports.RESEARCH_COST_BY_AGE = exports.AGES = exports.FIXED_RESEARCH_COSTS = exports.SETTLERS_WAIT_FOR_SIZE_TWO = exports.DEFECTORS_STAY_VETERAN = exports.SDI_DEFENSE_SPARES_CITIES = exports.EVEN_ADVANCE_STEALING = exports.UNITED_NATIONS_STOPS_COMPUTER_WARS = exports.BARBARIAN_UPRISINGS = exports.BARBARIAN_CITY_BUILDS = exports.POLLUTION_IN_EVERY_CITY = exports.CAPTURED_CITY_BUILD = exports.OBSOLETE_BUILDS = exports.BARBARIAN_LEADER_RANSOM = exports.HYDRO_PLANT_SITE = exports.ENHANCED = void 0;
 /** Every rule set of this package. */
 exports.ENHANCED = 'civ1-enhanced';
 /**
@@ -87,4 +87,10 @@ exports.AGES = 'civ1-enhanced:ages';
  * catch-up rules while it is on. Off to start with.
  */
 exports.RESEARCH_COST_BY_AGE = 'civ1-enhanced:research-cost-by-age';
+/**
+ * The advances a civilization started with count towards its research costs, its power ranking and its chance of
+ * pollution, as every advance it knows does (civ-clone/web-renderer#973). v474.05 counts only those gained in play
+ * (`tech_count`). Takes the place of `civ1-science`'s count while it is on, as the game always has. On to start with.
+ */
+exports.STARTING_ADVANCES_COUNT = 'civ1-enhanced:starting-advances-count';
 //# sourceMappingURL=RuleSets.js.map
