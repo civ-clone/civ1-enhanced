@@ -57,3 +57,10 @@ export declare const SETTLERS_WAIT_RULE =
   'civ1-enhanced:city/hold/settlers-until-size-two';
 /** An advance costs its tier's weight times the rate, whatever its player knows. */
 export declare const TIERED_COST_RULE = 'civ1-enhanced:research/cost/by-tier';
+/** A civilization's age is that of the latest research tier it knows an advance of (civ-clone/web-renderer#1076). */
+export declare const AGE_BY_TIER_RULE = 'civ1-enhanced:research/age/by-tier';
+/** An advance gained that starts a new age for its player reaches it. */
+export declare const REACH_AGE_RULE =
+  'civ1-enhanced:research/complete/reach-age';
+/** A player reaching an age is told to the engine's listeners (`player:age-reached`). */
+export declare const AGE_REACHED_RULE = 'civ1-enhanced:player/age-reached/emit';

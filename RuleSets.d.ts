@@ -78,3 +78,9 @@ export declare const SETTLERS_WAIT_FOR_SIZE_TWO =
  */
 export declare const FIXED_RESEARCH_COSTS =
   'civ1-enhanced:fixed-research-costs';
+/**
+ * Each civilization moves through eight ages as it learns, one for each research tier (`ResearchTiers`, `Ages`): it
+ * enters an age with the first advance it gains of that tier, and is told so (civ-clone/web-renderer#1076). Rules
+ * added to Civ1's, so nothing to supersede. Off to start with.
+ */
+export declare const AGES = 'civ1-enhanced:ages';

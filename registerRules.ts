@@ -71,6 +71,10 @@ import { COST_RULE as CIV1_COST_RULE } from '@civ-clone/civ1-science/RuleIds';
 import { FIXED_RESEARCH_COSTS } from './RuleSets';
 import { TIERED_COST_RULE } from './RuleIds';
 import researchCost from './Rules/Research/cost';
+// civ-clone/web-renderer#1076
+import { AGE_BY_TIER_RULE, AGE_REACHED_RULE, REACH_AGE_RULE } from './RuleIds';
+import { AGES } from './RuleSets';
+import researchAge from './Rules/Research/age';
 
 export const register = (game: Game): void => {
   // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
@@ -149,6 +153,14 @@ export const register = (game: Game): void => {
         FIXED_RESEARCH_COSTS,
         { enabled: false, supersedes: [CIV1_COST_RULE] },
         TIERED_COST_RULE
+      ),
+      // civ-clone/web-renderer#1076: rules added to Civ1's, so nothing to supersede.
+      new RuleSet(
+        AGES,
+        { enabled: false },
+        AGE_BY_TIER_RULE,
+        REACH_AGE_RULE,
+        AGE_REACHED_RULE
       )
     )
   );
@@ -171,7 +183,9 @@ export const register = (game: Game): void => {
     ...cityLostImprovements(game),
     ...cityGainedImprovements(game),
     // civ-clone/web-renderer#1072
-    ...researchCost(game)
+    ...researchCost(game),
+    // civ-clone/web-renderer#1076
+    ...researchAge(game)
   );
 
   // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the
