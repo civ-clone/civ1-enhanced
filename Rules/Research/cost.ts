@@ -20,6 +20,7 @@ export type ResearchCostGame = Pick<
   | 'difficulty'
   | 'playerResearch'
   | 'requirements'
+  | 'rules'
   | 'turn'
   | 'year'
 >;
@@ -31,6 +32,8 @@ export const getRules = (game: ResearchCostGame): Cost[] => {
       playerResearchRegistry: game.playerResearch,
       turn: game.turn,
       year: game.year,
+      // Its multiplier and catch-up, which a set can change (civ-clone/web-renderer#1077).
+      ruleRegistry: game.rules,
     },
     // Each advance's tier's weight, worked out again only when the tiers are (`advanceTiers`).
     weights = (() => {
@@ -62,12 +65,15 @@ export const getRules = (game: ResearchCostGame): Cost[] => {
       //  advance cost 4 × 10 = 40 at Chieftain, where civ1-science's costs 10 and this one costs 4 × 6 = 24. An advance
       //  with no tier (Future Technology) costs what it does by `civ1-science`'s.
       TIERED_COST_RULE,
+      // To the nearest whole bulb, as a multiplier that isn't whole can make it a fraction.
       new Effect((CostAdvance: typeof Advance, playerResearch) =>
-        tieredCost(
-          weights(),
-          (research) => rate(context, research, false),
-          (AnyAdvance, research) => costByAdvancesKnown(context, research)
-        )(CostAdvance, playerResearch)
+        Math.round(
+          tieredCost(
+            weights(),
+            (research) => rate(context, research, false),
+            (AnyAdvance, research) => costByAdvancesKnown(context, research)
+          )(CostAdvance, playerResearch)
+        )
       )
     ),
   ];

@@ -14,6 +14,7 @@ import {
   SETTLERS_WAIT_FOR_SIZE_TWO,
   UNITED_NATIONS_STOPS_COMPUTER_WARS,
   AGES,
+  RESEARCH_COST_BY_AGE,
 } from '../RuleSets';
 // The Civ1 rules this package's sets change, and the rules they change them with (civ-clone/web-renderer#954).
 import { Game } from '@civ-clone/core-game/Game';
@@ -40,6 +41,8 @@ import {
   AGE_REACHED_RULE,
   AGES_JOINED_RULE,
   AGES_SETTLED_RULE,
+  CATCH_UP_FROM_RENAISSANCE_RULE,
+  RATE_MULTIPLIER_BY_AGE_RULE,
   REACH_AGE_RULE,
 } from '../RuleIds';
 import {
@@ -59,7 +62,11 @@ import {
   RANSOM_RULE as CIV1_RANSOM,
 } from '@civ-clone/civ1-barbarians/RuleIds';
 import { KEEP_BUILD_RULE as CIV1_KEEP_BUILD } from '@civ-clone/civ1-city/RuleIds';
-import { COST_RULE as CIV1_COST } from '@civ-clone/civ1-science/RuleIds';
+import {
+  CATCH_UP_RULE as CIV1_CATCH_UP,
+  COST_RULE as CIV1_COST,
+  RATE_MULTIPLIER_RULE as CIV1_RATE_MULTIPLIER,
+} from '@civ-clone/civ1-science/RuleIds';
 
 // Each set that takes the place of a Civ1 rule, the rule it takes the place of, and its own: all on to start with.
 const replacements: [string, string, string][] = [
@@ -95,6 +102,13 @@ const ageRules = [
   AGE_REACHED_RULE,
 ];
 
+// The research cost by age's two rules, each in place of one of civ1-science's: off to start with
+//  (civ-clone/web-renderer#1077).
+const byAge: [string, string][] = [
+  [CIV1_RATE_MULTIPLIER, RATE_MULTIPLIER_BY_AGE_RULE],
+  [CIV1_CATCH_UP, CATCH_UP_FROM_RENAISSANCE_RULE],
+];
+
 const enabled = (game: Game, id: string): boolean =>
   game.rules.getById(id)!.enabled();
 
@@ -118,7 +132,7 @@ describe('registerRules', (): void => {
     expect((): void => register(game)).not.to.throw();
   });
 
-  it('should hold its fourteen sets under one parent, with the ids exported', (): void => {
+  it('should hold its fifteen sets under one parent, with the ids exported', (): void => {
     const game = loadGame(everyPackage);
 
     expect(ENHANCED).to.equal('civ1-enhanced');
@@ -152,6 +166,7 @@ describe('registerRules', (): void => {
     );
     expect(FIXED_RESEARCH_COSTS).to.equal('civ1-enhanced:fixed-research-costs');
     expect(AGES).to.equal('civ1-enhanced:ages');
+    expect(RESEARCH_COST_BY_AGE).to.equal('civ1-enhanced:research-cost-by-age');
     expect(game.ruleSets.get(ENHANCED)!.memberIds()).to.eql([
       HYDRO_PLANT_SITE,
       BARBARIAN_LEADER_RANSOM,
@@ -167,7 +182,14 @@ describe('registerRules', (): void => {
       SETTLERS_WAIT_FOR_SIZE_TWO,
       FIXED_RESEARCH_COSTS,
       AGES,
+      RESEARCH_COST_BY_AGE,
     ]);
+    expect(game.ruleSets.get(RESEARCH_COST_BY_AGE)!.supersedes()).to.eql(
+      byAge.map(([civ1Rule]) => civ1Rule)
+    );
+    expect(game.ruleSets.get(RESEARCH_COST_BY_AGE)!.memberIds()).to.eql(
+      byAge.map(([, rule]) => rule)
+    );
     expect(game.ruleSets.get(AGES)!.supersedes()).to.eql([]);
     expect(game.ruleSets.get(AGES)!.memberIds()).to.eql(ageRules);
     expect(game.ruleSets.get(HYDRO_PLANT_SITE)!.supersedes()).to.eql([
@@ -219,6 +241,10 @@ describe('registerRules', (): void => {
     ageRules.forEach((id: string): void => {
       expect(enabled(game, id), id).false;
     });
+    byAge.forEach(([civ1Rule, rule]): void => {
+      expect(enabled(game, civ1Rule), civ1Rule).true;
+      expect(enabled(game, rule), rule).false;
+    });
 
     // Nothing differs from the defaults, so a save keeps nothing.
     expect(game.ruleSets.choices()).to.eql([]);
@@ -243,6 +269,10 @@ describe('registerRules', (): void => {
     ageRules.forEach((id: string): void => {
       expect(enabled(game, id), id).false;
     });
+    byAge.forEach(([civ1Rule, rule]): void => {
+      expect(enabled(game, civ1Rule), civ1Rule).true;
+      expect(enabled(game, rule), rule).false;
+    });
     expect(game.ruleSets.validate()).to.eql([]);
   });
 
@@ -261,6 +291,10 @@ describe('registerRules', (): void => {
     });
     ageRules.forEach((id: string): void => {
       expect(enabled(game, id), id).true;
+    });
+    byAge.forEach(([civ1Rule, rule]): void => {
+      expect(enabled(game, civ1Rule), civ1Rule).false;
+      expect(enabled(game, rule), rule).true;
     });
     expect(game.ruleSets.validate()).to.eql([]);
   });
@@ -284,6 +318,8 @@ describe('registerRules', (): void => {
       CIV1_START_AFRESH,
       CIV1_CHIEFTAIN_SETTLERS,
       CIV1_COST,
+      CIV1_RATE_MULTIPLIER,
+      CIV1_CATCH_UP,
     ]);
     superseded.forEach((id: string): void => {
       expect(game.rules.getById(id), id).not.to.be.null;
@@ -349,6 +385,11 @@ describe('registerRules', (): void => {
         ids: [FIXED_RESEARCH_COSTS, CIV1_COST],
         blocking: false,
       },
+      ...byAge.map(([civ1Rule]) => ({
+        kind: 'unknown-superseded',
+        ids: [RESEARCH_COST_BY_AGE, civ1Rule],
+        blocking: false,
+      })),
     ]);
     expect((): void => game.ruleSets.check()).not.to.throw();
   });

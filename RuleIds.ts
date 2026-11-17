@@ -99,3 +99,11 @@ export const REACH_AGE_RULE = 'civ1-enhanced:research/complete/reach-age';
 
 /** A player reaching an age is told to the engine's listeners (`player:age-reached`). */
 export const AGE_REACHED_RULE = 'civ1-enhanced:player/age-reached/emit';
+
+/** The rate of research cost is multiplied by the player's age's (civ-clone/web-renderer#1077). */
+export const RATE_MULTIPLIER_BY_AGE_RULE =
+  'civ1-enhanced:research/rate-multiplier/by-age';
+
+/** The rate rises when the leader is ahead of schedule, for a player in the Renaissance or later. */
+export const CATCH_UP_FROM_RENAISSANCE_RULE =
+  'civ1-enhanced:research/catch-up/from-renaissance';

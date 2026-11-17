@@ -81,6 +81,17 @@ import {
 } from './RuleIds';
 import { AGES } from './RuleSets';
 import researchAge from './Rules/Research/age';
+// civ-clone/web-renderer#1077
+import {
+  CATCH_UP_FROM_RENAISSANCE_RULE,
+  RATE_MULTIPLIER_BY_AGE_RULE,
+} from './RuleIds';
+import {
+  CATCH_UP_RULE as CIV1_CATCH_UP_RULE,
+  RATE_MULTIPLIER_RULE as CIV1_RATE_MULTIPLIER_RULE,
+} from '@civ-clone/civ1-science/RuleIds';
+import { RESEARCH_COST_BY_AGE } from './RuleSets';
+import rateByAge from './Rules/Research/rateByAge';
 
 export const register = (game: Game): void => {
   // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
@@ -169,6 +180,16 @@ export const register = (game: Game): void => {
         AGES_SETTLED_RULE,
         REACH_AGE_RULE,
         AGE_REACHED_RULE
+      ),
+      // civ-clone/web-renderer#1077
+      new RuleSet(
+        RESEARCH_COST_BY_AGE,
+        {
+          enabled: false,
+          supersedes: [CIV1_RATE_MULTIPLIER_RULE, CIV1_CATCH_UP_RULE],
+        },
+        RATE_MULTIPLIER_BY_AGE_RULE,
+        CATCH_UP_FROM_RENAISSANCE_RULE
       )
     )
   );
@@ -193,7 +214,9 @@ export const register = (game: Game): void => {
     // civ-clone/web-renderer#1072
     ...researchCost(game),
     // civ-clone/web-renderer#1076
-    ...researchAge(game)
+    ...researchAge(game),
+    // civ-clone/web-renderer#1077
+    ...rateByAge(game)
   );
 
   // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the

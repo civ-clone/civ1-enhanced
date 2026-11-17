@@ -125,3 +125,15 @@ switching those sets off there means no pollution and no uprisings at all, and t
   inherits, starts no age with what it is given until the next turn starts (`civ1-enhanced:player/added/hold-ages`,
   `civ1-enhanced:turn/start/settle-ages`, `lib/joining`). Rules added to Civ1's, so it
   supersedes nothing, and can be on with the fixed research costs or without them.
+- `civ1-enhanced:research-cost-by-age` (`RESEARCH_COST_BY_AGE`), off to start with: the rate of research cost follows
+  the player's age (civ-clone/web-renderer#1077) in place of `civ1-science`'s doubling from AD
+  (`civ1-science:research/rate-multiplier/doubled-from-ad`): 0.5, 0.65, 0.83, 1.08, 1.39, 1.80, 2.32 and 3 from the
+  first age to the eighth (`AgeResearchRates.ts`), so a rush into a later age makes every advance after it dearer, the
+  ones left behind too (`civ1-enhanced:research/rate-multiplier/by-age`). Its catch-up applies to a player from its own
+  Renaissance, in place of to everyone from AD (`civ1-enhanced:research/catch-up/from-renaissance`, superseding
+  `civ1-science:research/catch-up/from-ad`). The age is the latest research tier the player knows an advance of,
+  worked out from the tiers, so it holds with the ages switched off too, and with either research cost. An advance is
+  priced at the age its player is in when they start on it. Learning every advance in order costs 4,203 steps times
+  the rate by `civ1-science`'s cost, and 4,191 with the fixed research costs, before catch-up: about what a game
+  reaching AD at its 25th advance pays today (4,256). The human's floor of 11 - advances a step stays with
+  `civ1-science`'s cost, before the multiplier, as it was before the doubling. Costs are rounded to whole bulbs.
