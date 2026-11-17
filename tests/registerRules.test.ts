@@ -1,4 +1,5 @@
 import {
+  BARBARIAN_ACTIVITY,
   BARBARIAN_CITY_BUILDS,
   BARBARIAN_LEADER_RANSOM,
   BARBARIAN_UPRISINGS,
@@ -137,7 +138,7 @@ describe('registerRules', (): void => {
     expect((): void => register(game)).not.to.throw();
   });
 
-  it('should hold its sixteen sets under one parent, with the ids exported', (): void => {
+  it('should hold its seventeen sets under one parent, with the ids exported', (): void => {
     const game = loadGame(everyPackage);
 
     expect(ENHANCED).to.equal('civ1-enhanced');
@@ -175,6 +176,7 @@ describe('registerRules', (): void => {
     expect(STARTING_ADVANCES_COUNT).to.equal(
       'civ1-enhanced:starting-advances-count'
     );
+    expect(BARBARIAN_ACTIVITY).to.equal('civ1-enhanced:barbarian-activity');
     expect(game.ruleSets.get(ENHANCED)!.memberIds()).to.eql([
       HYDRO_PLANT_SITE,
       BARBARIAN_LEADER_RANSOM,
@@ -192,6 +194,7 @@ describe('registerRules', (): void => {
       AGES,
       RESEARCH_COST_BY_AGE,
       STARTING_ADVANCES_COUNT,
+      BARBARIAN_ACTIVITY,
     ]);
     expect(game.ruleSets.get(RESEARCH_COST_BY_AGE)!.supersedes()).to.eql(
       byAge.map(([civ1Rule]) => civ1Rule)

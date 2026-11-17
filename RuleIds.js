@@ -2,7 +2,7 @@
 // The ids of this package's rules that another package is expected to name (civ-clone/web-renderer#954): a set that
 //  supersedes one, or a host that switches or describes it. Imported, a rename breaks the other package's build.
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EVERY_ADVANCE_COUNT_RULE = exports.CATCH_UP_FROM_RENAISSANCE_RULE = exports.RATE_MULTIPLIER_BY_AGE_RULE = exports.AGE_REACHED_RULE = exports.REACH_AGE_RULE = exports.AGES_SETTLED_RULE = exports.AGES_JOINED_RULE = exports.AGE_BY_TIER_RULE = exports.TIERED_COST_RULE = exports.SETTLERS_WAIT_RULE = exports.KEEP_VETERAN_RULE = exports.HALVE_CITIES_RULE = exports.STEAL_RULE = exports.UNITED_NATIONS_PACIFIED_RULE = exports.LAND_UPRISING_RULE = exports.RAIDERS_ONLY_RULE = exports.POLLUTION_RULE = exports.CLEAR_CAPTURED_BUILD_RULE = exports.OBSOLETE_BUILDS_RULES = exports.DROP_EXCLUDED_BUILDS_CAPTURED_RULE = exports.DROP_EXCLUDED_BUILDS_COMPLETE_RULE = exports.DROP_BUILDS_NEEDING_UNSUPPORTED_RULE = exports.NOTE_UNSUPPORTED_RULE = exports.DROP_BUILDS_NEEDING_SABOTAGED_RULE = exports.NOTE_SABOTAGED_RULE = exports.DROP_BUILDS_NEEDING_SOLD_RULE = exports.REVALIDATE_BUILDS_RULE = exports.RANSOM_RULE = exports.HYDRO_PLANT_SITE_RULE = void 0;
+exports.BARBARIAN_ACTIVITY_RULE = exports.EVERY_ADVANCE_COUNT_RULE = exports.CATCH_UP_FROM_RENAISSANCE_RULE = exports.RATE_MULTIPLIER_BY_AGE_RULE = exports.AGE_REACHED_RULE = exports.REACH_AGE_RULE = exports.AGES_SETTLED_RULE = exports.AGES_JOINED_RULE = exports.AGE_BY_TIER_RULE = exports.TIERED_COST_RULE = exports.SETTLERS_WAIT_RULE = exports.KEEP_VETERAN_RULE = exports.HALVE_CITIES_RULE = exports.STEAL_RULE = exports.UNITED_NATIONS_PACIFIED_RULE = exports.LAND_UPRISING_RULE = exports.RAIDERS_ONLY_RULE = exports.POLLUTION_RULE = exports.CLEAR_CAPTURED_BUILD_RULE = exports.OBSOLETE_BUILDS_RULES = exports.DROP_EXCLUDED_BUILDS_CAPTURED_RULE = exports.DROP_EXCLUDED_BUILDS_COMPLETE_RULE = exports.DROP_BUILDS_NEEDING_UNSUPPORTED_RULE = exports.NOTE_UNSUPPORTED_RULE = exports.DROP_BUILDS_NEEDING_SABOTAGED_RULE = exports.NOTE_SABOTAGED_RULE = exports.DROP_BUILDS_NEEDING_SOLD_RULE = exports.REVALIDATE_BUILDS_RULE = exports.RANSOM_RULE = exports.HYDRO_PLANT_SITE_RULE = void 0;
 /** A Hydro Plant may be built with Mountains or a River on or next to the city's square. */
 exports.HYDRO_PLANT_SITE_RULE = 'civ1-enhanced:city/build/hydro-plant-site';
 /** A barbarian leader killed by a civilization pays it his ransom, however he dies. */
@@ -70,4 +70,9 @@ exports.RATE_MULTIPLIER_BY_AGE_RULE = 'civ1-enhanced:research/rate-multiplier/by
 exports.CATCH_UP_FROM_RENAISSANCE_RULE = 'civ1-enhanced:research/catch-up/from-renaissance';
 /** A player is counted as knowing every advance it knows, those it started with too (civ-clone/web-renderer#973). */
 exports.EVERY_ADVANCE_COUNT_RULE = 'civ1-enhanced:research/advance-count/every-advance-known';
+/**
+ * Answers `civ1-barbarians`' activity level (`Activity`) with the level chosen in `BARBARIAN_ACTIVITY_LEVEL`
+ *  (civ-clone/web-renderer#1008): the only rule of this package that does.
+ */
+exports.BARBARIAN_ACTIVITY_RULE = 'civ1-enhanced:barbarians/activity';
 //# sourceMappingURL=RuleIds.js.map

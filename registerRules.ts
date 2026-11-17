@@ -97,6 +97,11 @@ import { ADVANCE_COUNT_RULE as CIV1_ADVANCE_COUNT_RULE } from '@civ-clone/civ1-s
 import { EVERY_ADVANCE_COUNT_RULE } from './RuleIds';
 import { STARTING_ADVANCES_COUNT } from './RuleSets';
 import advanceCount from './Rules/Research/advanceCount';
+// civ-clone/web-renderer#1008
+import { BARBARIAN_ACTIVITY, BARBARIAN_ACTIVITY_LEVEL } from './RuleSets';
+import { DEFAULT_MEMBER, MEMBERS } from './BarbarianActivities';
+import { BARBARIAN_ACTIVITY_RULE } from './RuleIds';
+import barbarianActivity from './Rules/Barbarians/activity';
 
 export const register = (game: Game): void => {
   // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
@@ -201,6 +206,18 @@ export const register = (game: Game): void => {
         STARTING_ADVANCES_COUNT,
         { supersedes: [CIV1_ADVANCE_COUNT_RULE] },
         EVERY_ADVANCE_COUNT_RULE
+      ),
+      // civ-clone/web-renderer#1008: a choice can't start off, and a set switched off doesn't reach into one, so the set
+      //  holds the one rule that answers with the level, and the choice beneath it only says which.
+      new RuleSet(
+        BARBARIAN_ACTIVITY,
+        { enabled: false },
+        BARBARIAN_ACTIVITY_RULE,
+        new RuleSet(
+          BARBARIAN_ACTIVITY_LEVEL,
+          { exclusive: true, default: DEFAULT_MEMBER },
+          ...MEMBERS
+        )
       )
     )
   );
@@ -229,7 +246,9 @@ export const register = (game: Game): void => {
     // civ-clone/web-renderer#1077
     ...rateByAge(game),
     // civ-clone/web-renderer#973
-    ...advanceCount()
+    ...advanceCount(),
+    // civ-clone/web-renderer#1008
+    ...barbarianActivity(game)
   );
 
   // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the

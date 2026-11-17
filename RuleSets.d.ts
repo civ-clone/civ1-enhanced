@@ -99,3 +99,11 @@ export declare const RESEARCH_COST_BY_AGE =
  */
 export declare const STARTING_ADVANCES_COUNT =
   'civ1-enhanced:starting-advances-count';
+/**
+ * How active the barbarians are, chosen from `BARBARIAN_ACTIVITY_LEVEL` (civ-clone/web-renderer#1008). Its rule answers
+ * `civ1-barbarians`' activity level with the level chosen; switched off, nothing answers, and the barbarians are
+ * v474.05's whatever is chosen. Off to start with.
+ */
+export declare const BARBARIAN_ACTIVITY = 'civ1-enhanced:barbarian-activity';
+/** The choice of level beneath `BARBARIAN_ACTIVITY`: one member for each of `BarbarianActivities`' levels. */
+export declare const BARBARIAN_ACTIVITY_LEVEL: string;
