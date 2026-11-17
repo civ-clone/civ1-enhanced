@@ -10,13 +10,14 @@ import {
   OBSOLETE_BUILDS,
   POLLUTION_IN_EVERY_CITY,
   SDI_DEFENSE_SPARES_CITIES,
+  FIXED_RESEARCH_COSTS,
   SETTLERS_WAIT_FOR_SIZE_TWO,
   UNITED_NATIONS_STOPS_COMPUTER_WARS,
 } from '../RuleSets';
 // The Civ1 rules this package's sets change, and the rules they change them with (civ-clone/web-renderer#954).
 import { Game } from '@civ-clone/core-game/Game';
 import { expect } from 'chai';
-import loadGame, { Package, pluginOrder } from './lib/loadGame';
+import loadGame, { Package, everyPackage, pluginOrder } from './lib/loadGame';
 import register from '../registerRules';
 
 import {
@@ -32,6 +33,7 @@ import {
   REVALIDATE_BUILDS_RULE,
   SETTLERS_WAIT_RULE,
   STEAL_RULE,
+  TIERED_COST_RULE,
   UNITED_NATIONS_PACIFIED_RULE,
 } from '../RuleIds';
 import {
@@ -51,6 +53,7 @@ import {
   RANSOM_RULE as CIV1_RANSOM,
 } from '@civ-clone/civ1-barbarians/RuleIds';
 import { KEEP_BUILD_RULE as CIV1_KEEP_BUILD } from '@civ-clone/civ1-city/RuleIds';
+import { COST_RULE as CIV1_COST } from '@civ-clone/civ1-science/RuleIds';
 
 // Each set that takes the place of a Civ1 rule, the rule it takes the place of, and its own: all on to start with.
 const replacements: [string, string, string][] = [
@@ -73,6 +76,8 @@ const replacements: [string, string, string][] = [
 const variants: [string, string, string][] = [
   [SDI_DEFENSE_SPARES_CITIES, CIV1_HALVE_CITIES, HALVE_CITIES_RULE],
   [DEFECTORS_STAY_VETERAN, CIV1_START_AFRESH, KEEP_VETERAN_RULE],
+  // civ-clone/web-renderer#1072
+  [FIXED_RESEARCH_COSTS, CIV1_COST, TIERED_COST_RULE],
 ];
 
 const enabled = (game: Game, id: string): boolean =>
@@ -98,8 +103,8 @@ describe('registerRules', (): void => {
     expect((): void => register(game)).not.to.throw();
   });
 
-  it('should hold its twelve sets under one parent, with the ids exported', (): void => {
-    const game = loadGame();
+  it('should hold its thirteen sets under one parent, with the ids exported', (): void => {
+    const game = loadGame(everyPackage);
 
     expect(ENHANCED).to.equal('civ1-enhanced');
     expect(HYDRO_PLANT_SITE).to.equal('civ1-enhanced:hydro-plant-site');
@@ -130,6 +135,7 @@ describe('registerRules', (): void => {
     expect(SETTLERS_WAIT_FOR_SIZE_TWO).to.equal(
       'civ1-enhanced:settlers-wait-for-size-two'
     );
+    expect(FIXED_RESEARCH_COSTS).to.equal('civ1-enhanced:fixed-research-costs');
     expect(game.ruleSets.get(ENHANCED)!.memberIds()).to.eql([
       HYDRO_PLANT_SITE,
       BARBARIAN_LEADER_RANSOM,
@@ -143,6 +149,7 @@ describe('registerRules', (): void => {
       SDI_DEFENSE_SPARES_CITIES,
       DEFECTORS_STAY_VETERAN,
       SETTLERS_WAIT_FOR_SIZE_TWO,
+      FIXED_RESEARCH_COSTS,
     ]);
     expect(game.ruleSets.get(HYDRO_PLANT_SITE)!.supersedes()).to.eql([
       CIV1_HYDRO_PLANT_SITE,
@@ -170,7 +177,7 @@ describe('registerRules', (): void => {
   });
 
   it('should start as today: the Hydro Plant as v474.05, the rest as civ-clone', (): void => {
-    const game = loadGame();
+    const game = loadGame(everyPackage);
 
     expect(game.ruleSets.state(ENHANCED)).to.equal('mixed');
     expect(game.ruleSets.state(HYDRO_PLANT_SITE)).to.equal('off');
@@ -194,8 +201,8 @@ describe('registerRules', (): void => {
     expect(game.ruleSets.choices()).to.eql([]);
   });
 
-  it('should show the parent as mixed, and leave exactly the v474.05 rules running for all twelve when it is switched off', (): void => {
-    const game = loadGame();
+  it('should show the parent as mixed, and leave exactly the v474.05 rules running for all thirteen when it is switched off', (): void => {
+    const game = loadGame(everyPackage);
 
     expect(game.ruleSets.state(ENHANCED)).to.equal('mixed');
 
@@ -214,7 +221,7 @@ describe('registerRules', (): void => {
   });
 
   it('should switch on every enhanced rule when the parent is switched on, and supersede every Civ1 rule they replace', (): void => {
-    const game = loadGame();
+    const game = loadGame(everyPackage);
 
     game.ruleSets.set(ENHANCED, true);
 
@@ -232,7 +239,7 @@ describe('registerRules', (): void => {
   // A superseded id that names no rule is only shown (`unknown-superseded`), not blocking, and the rule it meant goes
   //  on running beside its replacement: a renamed Civ1 ransom rule paid a lone leader 200 gold.
   it('should supersede only rules that are registered, with every package loaded, so no Civ1 rule runs beside its replacement', (): void => {
-    const game = loadGame(),
+    const game = loadGame(everyPackage),
       superseded = game.ruleSets.entries().flatMap((set) => set.supersedes());
 
     expect(superseded).to.eql([
@@ -247,6 +254,7 @@ describe('registerRules', (): void => {
       CIV1_HALVE_CITIES,
       CIV1_START_AFRESH,
       CIV1_CHIEFTAIN_SETTLERS,
+      CIV1_COST,
     ]);
     superseded.forEach((id: string): void => {
       expect(game.rules.getById(id), id).not.to.be.null;
@@ -259,7 +267,7 @@ describe('registerRules', (): void => {
   });
 
   it('should find no problems with every package loaded, in either state', (): void => {
-    const game = loadGame();
+    const game = loadGame(everyPackage);
 
     expect(game.ruleSets.validate()).to.eql([]);
     expect((): void => game.ruleSets.check()).not.to.throw();
@@ -307,6 +315,11 @@ describe('registerRules', (): void => {
         ids: [UNITED_NATIONS_STOPS_COMPUTER_WARS, CIV1_UNITED_NATIONS_PACIFIED],
         blocking: false,
       },
+      {
+        kind: 'unknown-superseded',
+        ids: [FIXED_RESEARCH_COSTS, CIV1_COST],
+        blocking: false,
+      },
     ]);
     expect((): void => game.ruleSets.check()).not.to.throw();
   });
@@ -323,7 +336,7 @@ describe('registerRules', (): void => {
   });
 
   it('should keep what was chosen through a save and a new game', (): void => {
-    const game = loadGame();
+    const game = loadGame(everyPackage);
 
     game.ruleSets.set(HYDRO_PLANT_SITE, true);
     game.ruleSets.set(BARBARIAN_LEADER_RANSOM, false);
@@ -349,7 +362,7 @@ describe('registerRules', (): void => {
       { id: SETTLERS_WAIT_FOR_SIZE_TWO, value: false },
     ]);
 
-    const restored = loadGame();
+    const restored = loadGame(everyPackage);
 
     expect(restored.ruleSets.restore(choices)).to.eql([]);
     expect(restored.ruleSets.choices()).to.eql(choices);
@@ -380,14 +393,14 @@ describe('registerRules', (): void => {
   });
 
   it('should keep the parent switched off through a save, as the sets that start on switched off', (): void => {
-    const game = loadGame();
+    const game = loadGame(everyPackage);
 
     game.ruleSets.set(ENHANCED, false);
 
     const choices = game.ruleSets.choices(),
-      restored = loadGame();
+      restored = loadGame(everyPackage);
 
-    // The Hydro Plant's, SDI Defense's and the defectors' sets already start off, so the parent switched off differs
+    // The Hydro Plant's, SDI Defense's, the defectors' and the research costs' sets already start off, so the parent switched off differs
     //  from the defaults in the others.
     expect(choices).to.eql([
       { id: BARBARIAN_LEADER_RANSOM, value: false },
@@ -441,6 +454,7 @@ describe('registerRules', (): void => {
         'civ1-city',
         'civ1-city-improvement',
         'civ1-enhanced',
+        'civ1-science',
         'civ1-unit',
         'civ1-wonder',
       ]);
@@ -448,8 +462,8 @@ describe('registerRules', (): void => {
 
     orders.forEach(([name, order]): void => {
       it(`should leave the same rules running with ${name}, by default and with every set switched`, (): void => {
-        const byName = loadGame(),
-          other = loadGame(undefined, order);
+        const byName = loadGame(everyPackage),
+          other = loadGame(everyPackage, order);
 
         expect(running(other)).to.eql(running(byName));
 

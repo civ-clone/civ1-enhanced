@@ -55,3 +55,5 @@ export declare const KEEP_VETERAN_RULE =
 /** A city of size 1 doesn't complete Settlers until it is size 2. */
 export declare const SETTLERS_WAIT_RULE =
   'civ1-enhanced:city/hold/settlers-until-size-two';
+/** An advance costs its tier's weight times the rate, whatever its player knows. */
+export declare const TIERED_COST_RULE = 'civ1-enhanced:research/cost/by-tier';

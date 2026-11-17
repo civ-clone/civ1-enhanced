@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.scriptedRng = exports.buildWorld = exports.loadGame = exports.civ1Packages = exports.pluginOrder = void 0;
+exports.scriptedRng = exports.buildWorld = exports.loadGame = exports.everyPackage = exports.civ1Packages = exports.pluginOrder = void 0;
 const Game_1 = require("@civ-clone/core-game/Game");
 const FillGenerator_1 = require("@civ-clone/simple-world-generator/tests/lib/FillGenerator");
 const Terrains_1 = require("@civ-clone/civ1-world/Terrains");
@@ -8,6 +8,7 @@ const World_1 = require("@civ-clone/core-world/World");
 const registerRules_1 = require("@civ-clone/civ1-barbarians/registerRules");
 const registerRules_2 = require("@civ-clone/civ1-city/registerRules");
 const registerRules_3 = require("@civ-clone/civ1-city-improvement/registerRules");
+const Advances = require("@civ-clone/civ1-science/Advances");
 const registerRules_4 = require("../../registerRules");
 const registerRules_5 = require("@civ-clone/civ1-unit/registerRules");
 const registerRules_6 = require("@civ-clone/civ1-wonder/registerRules");
@@ -16,6 +17,12 @@ const registers = {
     'civ1-city': registerRules_2.default,
     'civ1-city-improvement': registerRules_3.default,
     'civ1-enhanced': registerRules_4.default,
+    // Its advances too, which the package registers into the default game's registry when imported. Required only
+    //  when asked for: importing `registerRules` registers its rules into the default game, which other tests use.
+    'civ1-science': (game) => {
+        game.advances.register(...Object.values(Advances));
+        require('@civ-clone/civ1-science/registerRules').register(game);
+    },
     'civ1-unit': registerRules_5.default,
     'civ1-wonder': registerRules_6.default,
 };
@@ -29,6 +36,11 @@ exports.civ1Packages = [
     'civ1-unit',
     'civ1-wonder',
 ];
+/**
+ * Those and `civ1-science`, whose cost rule `FIXED_RESEARCH_COSTS` takes the place of: for the tests of every set
+ * together. Not loaded by the others, as its rule giving each player added research would clash with theirs.
+ */
+exports.everyPackage = [...exports.civ1Packages, 'civ1-science'];
 /**
  * A game with the Civ1 packages named (all of them unless told otherwise) and this one registered against it, in the
  * order given: the plugin loader's, by name, unless told otherwise. `slots` are the game's own, such as its `rng`.

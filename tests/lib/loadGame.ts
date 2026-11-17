@@ -5,6 +5,7 @@ import World from '@civ-clone/core-world/World';
 import registerBarbarians from '@civ-clone/civ1-barbarians/registerRules';
 import registerCity from '@civ-clone/civ1-city/registerRules';
 import registerCityImprovement from '@civ-clone/civ1-city-improvement/registerRules';
+import * as Advances from '@civ-clone/civ1-science/Advances';
 import registerEnhanced from '../../registerRules';
 import registerUnit from '@civ-clone/civ1-unit/registerRules';
 import registerWonder from '@civ-clone/civ1-wonder/registerRules';
@@ -14,6 +15,7 @@ export type Civ1Package =
   | 'civ1-barbarians'
   | 'civ1-city'
   | 'civ1-city-improvement'
+  | 'civ1-science'
   | 'civ1-unit'
   | 'civ1-wonder';
 
@@ -24,6 +26,12 @@ const registers: { [name in Package]: (game: Game) => void } = {
   'civ1-city': registerCity,
   'civ1-city-improvement': registerCityImprovement,
   'civ1-enhanced': registerEnhanced,
+  // Its advances too, which the package registers into the default game's registry when imported. Required only
+  //  when asked for: importing `registerRules` registers its rules into the default game, which other tests use.
+  'civ1-science': (game: Game): void => {
+    game.advances.register(...Object.values(Advances));
+    require('@civ-clone/civ1-science/registerRules').register(game);
+  },
   'civ1-unit': registerUnit,
   'civ1-wonder': registerWonder,
 };
@@ -41,6 +49,12 @@ export const civ1Packages: Civ1Package[] = [
   'civ1-unit',
   'civ1-wonder',
 ];
+
+/**
+ * Those and `civ1-science`, whose cost rule `FIXED_RESEARCH_COSTS` takes the place of: for the tests of every set
+ * together. Not loaded by the others, as its rule giving each player added research would clash with theirs.
+ */
+export const everyPackage: Civ1Package[] = [...civ1Packages, 'civ1-science'];
 
 /**
  * A game with the Civ1 packages named (all of them unless told otherwise) and this one registered against it, in the

@@ -71,3 +71,10 @@ export declare const DEFECTORS_STAY_VETERAN =
  */
 export declare const SETTLERS_WAIT_FOR_SIZE_TWO =
   'civ1-enhanced:settlers-wait-for-size-two';
+/**
+ * Each advance costs a fixed weight by its tier (`ResearchTiers`) times the rate, however many advances its player
+ * knows, so a beeline to The Republic costs what learning steadily does (civ-clone/web-renderer#1072). Takes the place
+ * of `civ1-science`'s cost by advances known while it is on. Off to start with.
+ */
+export declare const FIXED_RESEARCH_COSTS =
+  'civ1-enhanced:fixed-research-costs';

@@ -103,3 +103,13 @@ switching those sets off there means no pollution and no uprisings at all, and t
   Settlers staying on its square (`civ1-unit`'s `city/building-complete/settlers-shrink-city`, which never sees a
   size-1 city while this set is on). Before this set, a size-1 city was destroyed by its Settlers, which went with it,
   at every level.
+- `civ1-enhanced:fixed-research-costs` (`FIXED_RESEARCH_COSTS`), off to start with: `civ1-enhanced:research/cost/by-tier`
+  costs each advance a fixed weight by its tier times the rate, however many advances its player knows
+  (civ-clone/web-renderer#1072), so a beeline to The Republic that skips the dead ends costs what learning steadily
+  does, while learning all 67 advances costs the same 2,278 steps times the rate as before. The tiers
+  (`ResearchTiers.ts`) band the advances by how many advances each needs in its whole tree, read from the game's
+  `requires` entries when the first cost is asked for, with weights 4, 12, 23, 33, 40, 47, 55 and 62
+  (`@civ-clone/base-science-research-tiered-cost`, whose `check` the tests run). The rate is `civ1-science`'s
+  (difficulty, catch-up, doubled from AD) without the human's floor of 11 - advances a step. Future Technology has no
+  tier and costs what it does by `civ1-science`'s rule. Supersedes `civ1-science:research/cost/by-advances-known`,
+  v474.05's, where an advance costs the advances known, plus one, times the rate.
