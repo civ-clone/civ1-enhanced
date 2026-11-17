@@ -12,6 +12,7 @@ import Player from '@civ-clone/core-player/Player';
 import { Prince } from '@civ-clone/civ1-difficulty/Difficulties';
 import Turn from '@civ-clone/core-turn-based-game/Turn';
 import Year from '@civ-clone/core-game-year/Year';
+import { CATCH_UP_FROM_RENAISSANCE_RULE } from '../RuleIds';
 import { ageRateMultipliers } from '../AgeResearchRates';
 import { expect } from 'chai';
 import loadGame from './lib/loadGame';
@@ -105,6 +106,21 @@ describe('research cost by age (civ-clone/web-renderer#1077)', (): void => {
     expect(
       setUp({ fixed: true, known: [TheRepublic], year: 1 }).cost(Writing)
     ).to.equal(100);
+  });
+
+  it("should leave the other half as civ1-science's with only one of its rules switched on", (): void => {
+    // Only the catch-up from the Renaissance: in AD, doubled as v474.05's, 2 × 10 × 2 = 40, not × 0.5.
+    const { game, cost } = setUp({
+      byAge: false,
+      known: [Alphabet],
+      year: 1,
+      turn: 900,
+    });
+
+    game.ruleSets.set(CATCH_UP_FROM_RENAISSANCE_RULE, true);
+
+    expect(game.ruleSets.state(RESEARCH_COST_BY_AGE)).to.equal('mixed');
+    expect(cost(Writing)).to.equal(40);
   });
 
   it('should price the advance that starts a new age at the age before', (): void => {

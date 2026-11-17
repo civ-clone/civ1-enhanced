@@ -35,7 +35,7 @@ const getRules = (game) => {
     })();
     return [
         new Cost_1.default(
-        // The same rate as `civ1-science`'s rule (difficulty, catch-up, doubled from AD), times the advance's weight in
+        // The same rate as `civ1-science`'s rule (difficulty, catch-up, doubled from AD or by age), times the advance's weight in
         //  place of the advances known. Without the human's floor of 11 - advances a step: the first tier's weight
         //  already keeps the first advances from costing next to nothing, and keeping the floor too would make the first
         //  advance cost 4 × 10 = 40 at Chieftain, where civ1-science's costs 10 and this one costs 4 × 6 = 24. An advance
