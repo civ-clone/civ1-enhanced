@@ -8,6 +8,7 @@ export type ResearchCostGame = Pick<
   | 'difficulty'
   | 'playerResearch'
   | 'requirements'
+  | 'rules'
   | 'turn'
   | 'year'
 >;

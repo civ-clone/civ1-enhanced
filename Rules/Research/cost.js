@@ -15,6 +15,8 @@ const getRules = (game) => {
         playerResearchRegistry: game.playerResearch,
         turn: game.turn,
         year: game.year,
+        // Its multiplier and catch-up, which a set can change (civ-clone/web-renderer#1077).
+        ruleRegistry: game.rules,
     }, 
     // Each advance's tier's weight, worked out again only when the tiers are (`advanceTiers`).
     weights = (() => {
@@ -33,12 +35,14 @@ const getRules = (game) => {
     })();
     return [
         new Cost_1.default(
-        // The same rate as `civ1-science`'s rule (difficulty, catch-up, doubled from AD), times the advance's weight in
+        // The same rate as `civ1-science`'s rule (difficulty, catch-up, doubled from AD or by age), times the advance's weight in
         //  place of the advances known. Without the human's floor of 11 - advances a step: the first tier's weight
         //  already keeps the first advances from costing next to nothing, and keeping the floor too would make the first
         //  advance cost 4 × 10 = 40 at Chieftain, where civ1-science's costs 10 and this one costs 4 × 6 = 24. An advance
         //  with no tier (Future Technology) costs what it does by `civ1-science`'s.
-        RuleIds_1.TIERED_COST_RULE, new Effect_1.default((CostAdvance, playerResearch) => (0, cost_2.default)(weights(), (research) => (0, cost_1.rate)(context, research, false), (AnyAdvance, research) => (0, cost_1.costByAdvancesKnown)(context, research))(CostAdvance, playerResearch))),
+        RuleIds_1.TIERED_COST_RULE, 
+        // To the nearest whole bulb, as a multiplier that isn't whole can make it a fraction.
+        new Effect_1.default((CostAdvance, playerResearch) => Math.round((0, cost_2.default)(weights(), (research) => (0, cost_1.rate)(context, research, false), (AnyAdvance, research) => (0, cost_1.costByAdvancesKnown)(context, research))(CostAdvance, playerResearch)))),
     ];
 };
 exports.getRules = getRules;

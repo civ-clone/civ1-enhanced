@@ -2,7 +2,7 @@
 // The ids of the rule sets this package registers (civ-clone/web-renderer#954), for whatever switches them. Each is a
 //  departure from v474.05, and all are beneath `ENHANCED`, so a game can switch them as one.
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AGES = exports.FIXED_RESEARCH_COSTS = exports.SETTLERS_WAIT_FOR_SIZE_TWO = exports.DEFECTORS_STAY_VETERAN = exports.SDI_DEFENSE_SPARES_CITIES = exports.EVEN_ADVANCE_STEALING = exports.UNITED_NATIONS_STOPS_COMPUTER_WARS = exports.BARBARIAN_UPRISINGS = exports.BARBARIAN_CITY_BUILDS = exports.POLLUTION_IN_EVERY_CITY = exports.CAPTURED_CITY_BUILD = exports.OBSOLETE_BUILDS = exports.BARBARIAN_LEADER_RANSOM = exports.HYDRO_PLANT_SITE = exports.ENHANCED = void 0;
+exports.RESEARCH_COST_BY_AGE = exports.AGES = exports.FIXED_RESEARCH_COSTS = exports.SETTLERS_WAIT_FOR_SIZE_TWO = exports.DEFECTORS_STAY_VETERAN = exports.SDI_DEFENSE_SPARES_CITIES = exports.EVEN_ADVANCE_STEALING = exports.UNITED_NATIONS_STOPS_COMPUTER_WARS = exports.BARBARIAN_UPRISINGS = exports.BARBARIAN_CITY_BUILDS = exports.POLLUTION_IN_EVERY_CITY = exports.CAPTURED_CITY_BUILD = exports.OBSOLETE_BUILDS = exports.BARBARIAN_LEADER_RANSOM = exports.HYDRO_PLANT_SITE = exports.ENHANCED = void 0;
 /** Every rule set of this package. */
 exports.ENHANCED = 'civ1-enhanced';
 /**
@@ -80,4 +80,11 @@ exports.FIXED_RESEARCH_COSTS = 'civ1-enhanced:fixed-research-costs';
  * added to Civ1's, so nothing to supersede. Off to start with.
  */
 exports.AGES = 'civ1-enhanced:ages';
+/**
+ * The rate of research cost follows the player's age, from half in the first to three times in the eighth, in place of
+ * doubling from AD, and its catch-up applies from the player's own Renaissance rather than for everyone from AD
+ * (civ-clone/web-renderer#1077). With either research cost. Takes the place of `civ1-science`'s multiplier and
+ * catch-up rules while it is on. Off to start with.
+ */
+exports.RESEARCH_COST_BY_AGE = 'civ1-enhanced:research-cost-by-age';
 //# sourceMappingURL=RuleSets.js.map

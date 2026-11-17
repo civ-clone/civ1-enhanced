@@ -95,3 +95,11 @@ export const FIXED_RESEARCH_COSTS = 'civ1-enhanced:fixed-research-costs';
  * added to Civ1's, so nothing to supersede. Off to start with.
  */
 export const AGES = 'civ1-enhanced:ages';
+
+/**
+ * The rate of research cost follows the player's age, from half in the first to three times in the eighth, in place of
+ * doubling from AD, and its catch-up applies from the player's own Renaissance rather than for everyone from AD
+ * (civ-clone/web-renderer#1077). With either research cost. Takes the place of `civ1-science`'s multiplier and
+ * catch-up rules while it is on. Off to start with.
+ */
+export const RESEARCH_COST_BY_AGE = 'civ1-enhanced:research-cost-by-age';
