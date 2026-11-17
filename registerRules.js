@@ -60,7 +60,7 @@ const register = (game) => {
     // civ-clone/web-renderer#1072
     new RuleSet_1.default(RuleSets_4.FIXED_RESEARCH_COSTS, { enabled: false, supersedes: [RuleIds_9.COST_RULE] }, RuleIds_10.TIERED_COST_RULE), 
     // civ-clone/web-renderer#1076: rules added to Civ1's, so nothing to supersede.
-    new RuleSet_1.default(RuleSets_5.AGES, { enabled: false }, RuleIds_11.AGE_BY_TIER_RULE, RuleIds_11.REACH_AGE_RULE, RuleIds_11.AGE_REACHED_RULE)));
+    new RuleSet_1.default(RuleSets_5.AGES, { enabled: false }, RuleIds_11.AGE_BY_TIER_RULE, RuleIds_11.AGES_JOINED_RULE, RuleIds_11.AGES_SETTLED_RULE, RuleIds_11.REACH_AGE_RULE, RuleIds_11.AGE_REACHED_RULE)));
     game.rules.register(...(0, build_1.default)(game), ...(0, captured_1.default)(game), ...(0, processYield_1.default)(game), ...(0, researchComplete_1.default)(game), ...(0, start_1.default)(game), ...(0, destroyed_1.default)(game), 
     // civ-clone/web-renderer#960
     ...(0, pacified_1.default)(game), ...(0, technologyStolen_1.default)(game), ...(0, detonated_1.default)(game), ...(0, transferred_1.default)(game), 

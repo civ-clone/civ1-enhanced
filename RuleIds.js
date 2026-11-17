@@ -2,7 +2,7 @@
 // The ids of this package's rules that another package is expected to name (civ-clone/web-renderer#954): a set that
 //  supersedes one, or a host that switches or describes it. Imported, a rename breaks the other package's build.
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AGE_REACHED_RULE = exports.REACH_AGE_RULE = exports.AGE_BY_TIER_RULE = exports.TIERED_COST_RULE = exports.SETTLERS_WAIT_RULE = exports.KEEP_VETERAN_RULE = exports.HALVE_CITIES_RULE = exports.STEAL_RULE = exports.UNITED_NATIONS_PACIFIED_RULE = exports.LAND_UPRISING_RULE = exports.RAIDERS_ONLY_RULE = exports.POLLUTION_RULE = exports.CLEAR_CAPTURED_BUILD_RULE = exports.OBSOLETE_BUILDS_RULES = exports.DROP_EXCLUDED_BUILDS_CAPTURED_RULE = exports.DROP_EXCLUDED_BUILDS_COMPLETE_RULE = exports.DROP_BUILDS_NEEDING_UNSUPPORTED_RULE = exports.NOTE_UNSUPPORTED_RULE = exports.DROP_BUILDS_NEEDING_SABOTAGED_RULE = exports.NOTE_SABOTAGED_RULE = exports.DROP_BUILDS_NEEDING_SOLD_RULE = exports.REVALIDATE_BUILDS_RULE = exports.RANSOM_RULE = exports.HYDRO_PLANT_SITE_RULE = void 0;
+exports.AGE_REACHED_RULE = exports.REACH_AGE_RULE = exports.AGES_SETTLED_RULE = exports.AGES_JOINED_RULE = exports.AGE_BY_TIER_RULE = exports.TIERED_COST_RULE = exports.SETTLERS_WAIT_RULE = exports.KEEP_VETERAN_RULE = exports.HALVE_CITIES_RULE = exports.STEAL_RULE = exports.UNITED_NATIONS_PACIFIED_RULE = exports.LAND_UPRISING_RULE = exports.RAIDERS_ONLY_RULE = exports.POLLUTION_RULE = exports.CLEAR_CAPTURED_BUILD_RULE = exports.OBSOLETE_BUILDS_RULES = exports.DROP_EXCLUDED_BUILDS_CAPTURED_RULE = exports.DROP_EXCLUDED_BUILDS_COMPLETE_RULE = exports.DROP_BUILDS_NEEDING_UNSUPPORTED_RULE = exports.NOTE_UNSUPPORTED_RULE = exports.DROP_BUILDS_NEEDING_SABOTAGED_RULE = exports.NOTE_SABOTAGED_RULE = exports.DROP_BUILDS_NEEDING_SOLD_RULE = exports.REVALIDATE_BUILDS_RULE = exports.RANSOM_RULE = exports.HYDRO_PLANT_SITE_RULE = void 0;
 /** A Hydro Plant may be built with Mountains or a River on or next to the city's square. */
 exports.HYDRO_PLANT_SITE_RULE = 'civ1-enhanced:city/build/hydro-plant-site';
 /** A barbarian leader killed by a civilization pays it his ransom, however he dies. */
@@ -56,6 +56,10 @@ exports.SETTLERS_WAIT_RULE = 'civ1-enhanced:city/hold/settlers-until-size-two';
 exports.TIERED_COST_RULE = 'civ1-enhanced:research/cost/by-tier';
 /** A civilization's age is that of the latest research tier it knows an advance of (civ-clone/web-renderer#1076). */
 exports.AGE_BY_TIER_RULE = 'civ1-enhanced:research/age/by-tier';
+/** A civilization added tells of no age for what it is given, until the next turn starts. */
+exports.AGES_JOINED_RULE = 'civ1-enhanced:player/added/hold-ages';
+/** As a turn starts, the civilizations added before it tell of their ages. */
+exports.AGES_SETTLED_RULE = 'civ1-enhanced:turn/start/settle-ages';
 /** An advance gained that starts a new age for its player reaches it. */
 exports.REACH_AGE_RULE = 'civ1-enhanced:research/complete/reach-age';
 /** A player reaching an age is told to the engine's listeners (`player:age-reached`). */

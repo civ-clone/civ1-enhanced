@@ -72,7 +72,13 @@ import { FIXED_RESEARCH_COSTS } from './RuleSets';
 import { TIERED_COST_RULE } from './RuleIds';
 import researchCost from './Rules/Research/cost';
 // civ-clone/web-renderer#1076
-import { AGE_BY_TIER_RULE, AGE_REACHED_RULE, REACH_AGE_RULE } from './RuleIds';
+import {
+  AGE_BY_TIER_RULE,
+  AGE_REACHED_RULE,
+  AGES_JOINED_RULE,
+  AGES_SETTLED_RULE,
+  REACH_AGE_RULE,
+} from './RuleIds';
 import { AGES } from './RuleSets';
 import researchAge from './Rules/Research/age';
 
@@ -159,6 +165,8 @@ export const register = (game: Game): void => {
         AGES,
         { enabled: false },
         AGE_BY_TIER_RULE,
+        AGES_JOINED_RULE,
+        AGES_SETTLED_RULE,
         REACH_AGE_RULE,
         AGE_REACHED_RULE
       )

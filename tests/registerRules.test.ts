@@ -38,6 +38,8 @@ import {
   UNITED_NATIONS_PACIFIED_RULE,
   AGE_BY_TIER_RULE,
   AGE_REACHED_RULE,
+  AGES_JOINED_RULE,
+  AGES_SETTLED_RULE,
   REACH_AGE_RULE,
 } from '../RuleIds';
 import {
@@ -85,7 +87,13 @@ const variants: [string, string, string][] = [
 ];
 
 // The ages' rules, added to Civ1's, so replacing nothing: off to start with (civ-clone/web-renderer#1076).
-const ageRules = [AGE_BY_TIER_RULE, REACH_AGE_RULE, AGE_REACHED_RULE];
+const ageRules = [
+  AGE_BY_TIER_RULE,
+  AGES_JOINED_RULE,
+  AGES_SETTLED_RULE,
+  REACH_AGE_RULE,
+  AGE_REACHED_RULE,
+];
 
 const enabled = (game: Game, id: string): boolean =>
   game.rules.getById(id)!.enabled();
@@ -231,6 +239,9 @@ describe('registerRules', (): void => {
       expect(game.ruleSets.state(set), set).to.equal('off');
       expect(enabled(game, civ1Rule), civ1Rule).true;
       expect(enabled(game, rule), rule).false;
+    });
+    ageRules.forEach((id: string): void => {
+      expect(enabled(game, id), id).false;
     });
     expect(game.ruleSets.validate()).to.eql([]);
   });
