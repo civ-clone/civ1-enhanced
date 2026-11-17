@@ -92,3 +92,10 @@ export declare const AGES = 'civ1-enhanced:ages';
  */
 export declare const RESEARCH_COST_BY_AGE =
   'civ1-enhanced:research-cost-by-age';
+/**
+ * The advances a civilization started with count towards its research costs, its power ranking and its chance of
+ * pollution, as every advance it knows does (civ-clone/web-renderer#973). v474.05 counts only those gained in play
+ * (`tech_count`). Takes the place of `civ1-science`'s count while it is on, as the game always has. On to start with.
+ */
+export declare const STARTING_ADVANCES_COUNT =
+  'civ1-enhanced:starting-advances-count';

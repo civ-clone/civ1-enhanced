@@ -107,3 +107,7 @@ export const RATE_MULTIPLIER_BY_AGE_RULE =
 /** The rate rises when the leader is ahead of schedule, for a player in the Renaissance or later. */
 export const CATCH_UP_FROM_RENAISSANCE_RULE =
   'civ1-enhanced:research/catch-up/from-renaissance';
+
+/** A player is counted as knowing every advance it knows, those it started with too (civ-clone/web-renderer#973). */
+export const EVERY_ADVANCE_COUNT_RULE =
+  'civ1-enhanced:research/advance-count/every-advance-known';

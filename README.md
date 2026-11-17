@@ -138,3 +138,10 @@ switching those sets off there means no pollution and no uprisings at all, and t
   the rate by `civ1-science`'s cost, and 4,191 with the fixed research costs, before catch-up: about what a game
   reaching AD at its 25th advance pays today (4,256). The human's floor of 11 - advances a step stays with
   `civ1-science`'s cost, before the multiplier, as it was before the doubling. Costs are rounded to whole bulbs.
+- `civ1-enhanced:starting-advances-count` (`STARTING_ADVANCES_COUNT`), on to start with: the advances a civilization
+  started with, or inherited when it came back, count towards its research costs, its power ranking and its chance of
+  pollution, as every advance it knows does (`civ1-enhanced:research/advance-count/every-advance-known`,
+  civ-clone/web-renderer#973), as the game has always counted them. It takes the place of
+  `civ1-science:research/advance-count/gained-in-play`, v474.05's `tech_count`, which counts only those gained in play:
+  with this set off, the 0 to 3 random advances each civilization starts with neither make its research dearer nor
+  raise its ranking.

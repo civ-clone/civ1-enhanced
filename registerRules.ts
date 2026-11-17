@@ -92,6 +92,11 @@ import {
 } from '@civ-clone/civ1-science/RuleIds';
 import { RESEARCH_COST_BY_AGE } from './RuleSets';
 import rateByAge from './Rules/Research/rateByAge';
+// civ-clone/web-renderer#973
+import { ADVANCE_COUNT_RULE as CIV1_ADVANCE_COUNT_RULE } from '@civ-clone/civ1-science/RuleIds';
+import { EVERY_ADVANCE_COUNT_RULE } from './RuleIds';
+import { STARTING_ADVANCES_COUNT } from './RuleSets';
+import advanceCount from './Rules/Research/advanceCount';
 
 export const register = (game: Game): void => {
   // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
@@ -190,6 +195,12 @@ export const register = (game: Game): void => {
         },
         RATE_MULTIPLIER_BY_AGE_RULE,
         CATCH_UP_FROM_RENAISSANCE_RULE
+      ),
+      // civ-clone/web-renderer#973: today's count, so on to start with.
+      new RuleSet(
+        STARTING_ADVANCES_COUNT,
+        { supersedes: [CIV1_ADVANCE_COUNT_RULE] },
+        EVERY_ADVANCE_COUNT_RULE
       )
     )
   );
@@ -216,7 +227,9 @@ export const register = (game: Game): void => {
     // civ-clone/web-renderer#1076
     ...researchAge(game),
     // civ-clone/web-renderer#1077
-    ...rateByAge(game)
+    ...rateByAge(game),
+    // civ-clone/web-renderer#973
+    ...advanceCount()
   );
 
   // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the

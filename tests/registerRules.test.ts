@@ -15,6 +15,7 @@ import {
   UNITED_NATIONS_STOPS_COMPUTER_WARS,
   AGES,
   RESEARCH_COST_BY_AGE,
+  STARTING_ADVANCES_COUNT,
 } from '../RuleSets';
 // The Civ1 rules this package's sets change, and the rules they change them with (civ-clone/web-renderer#954).
 import { Game } from '@civ-clone/core-game/Game';
@@ -44,6 +45,7 @@ import {
   CATCH_UP_FROM_RENAISSANCE_RULE,
   RATE_MULTIPLIER_BY_AGE_RULE,
   REACH_AGE_RULE,
+  EVERY_ADVANCE_COUNT_RULE,
 } from '../RuleIds';
 import {
   CHIEFTAIN_SETTLERS_RULE as CIV1_CHIEFTAIN_SETTLERS,
@@ -63,6 +65,7 @@ import {
 } from '@civ-clone/civ1-barbarians/RuleIds';
 import { KEEP_BUILD_RULE as CIV1_KEEP_BUILD } from '@civ-clone/civ1-city/RuleIds';
 import {
+  ADVANCE_COUNT_RULE as CIV1_ADVANCE_COUNT,
   CATCH_UP_RULE as CIV1_CATCH_UP,
   COST_RULE as CIV1_COST,
   RATE_MULTIPLIER_RULE as CIV1_RATE_MULTIPLIER,
@@ -82,6 +85,8 @@ const replacements: [string, string, string][] = [
   ],
   [EVEN_ADVANCE_STEALING, CIV1_STEAL, STEAL_RULE],
   [SETTLERS_WAIT_FOR_SIZE_TWO, CIV1_CHIEFTAIN_SETTLERS, SETTLERS_WAIT_RULE],
+  // civ-clone/web-renderer#973
+  [STARTING_ADVANCES_COUNT, CIV1_ADVANCE_COUNT, EVERY_ADVANCE_COUNT_RULE],
 ];
 
 // Each new variant that takes the place of a Civ1 rule, the rule it takes the place of, and its own: all off to start
@@ -132,7 +137,7 @@ describe('registerRules', (): void => {
     expect((): void => register(game)).not.to.throw();
   });
 
-  it('should hold its fifteen sets under one parent, with the ids exported', (): void => {
+  it('should hold its sixteen sets under one parent, with the ids exported', (): void => {
     const game = loadGame(everyPackage);
 
     expect(ENHANCED).to.equal('civ1-enhanced');
@@ -167,6 +172,9 @@ describe('registerRules', (): void => {
     expect(FIXED_RESEARCH_COSTS).to.equal('civ1-enhanced:fixed-research-costs');
     expect(AGES).to.equal('civ1-enhanced:ages');
     expect(RESEARCH_COST_BY_AGE).to.equal('civ1-enhanced:research-cost-by-age');
+    expect(STARTING_ADVANCES_COUNT).to.equal(
+      'civ1-enhanced:starting-advances-count'
+    );
     expect(game.ruleSets.get(ENHANCED)!.memberIds()).to.eql([
       HYDRO_PLANT_SITE,
       BARBARIAN_LEADER_RANSOM,
@@ -183,6 +191,7 @@ describe('registerRules', (): void => {
       FIXED_RESEARCH_COSTS,
       AGES,
       RESEARCH_COST_BY_AGE,
+      STARTING_ADVANCES_COUNT,
     ]);
     expect(game.ruleSets.get(RESEARCH_COST_BY_AGE)!.supersedes()).to.eql(
       byAge.map(([civ1Rule]) => civ1Rule)
@@ -320,6 +329,7 @@ describe('registerRules', (): void => {
       CIV1_COST,
       CIV1_RATE_MULTIPLIER,
       CIV1_CATCH_UP,
+      CIV1_ADVANCE_COUNT,
     ]);
     superseded.forEach((id: string): void => {
       expect(game.rules.getById(id), id).not.to.be.null;
@@ -390,6 +400,11 @@ describe('registerRules', (): void => {
         ids: [RESEARCH_COST_BY_AGE, civ1Rule],
         blocking: false,
       })),
+      {
+        kind: 'unknown-superseded',
+        ids: [STARTING_ADVANCES_COUNT, CIV1_ADVANCE_COUNT],
+        blocking: false,
+      },
     ]);
     expect((): void => game.ruleSets.check()).not.to.throw();
   });
@@ -482,6 +497,7 @@ describe('registerRules', (): void => {
       { id: UNITED_NATIONS_STOPS_COMPUTER_WARS, value: false },
       { id: EVEN_ADVANCE_STEALING, value: false },
       { id: SETTLERS_WAIT_FOR_SIZE_TWO, value: false },
+      { id: STARTING_ADVANCES_COUNT, value: false },
     ]);
     expect(restored.ruleSets.restore(choices)).to.eql([]);
     expect(restored.ruleSets.state(ENHANCED)).to.equal('off');
