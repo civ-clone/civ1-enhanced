@@ -5,6 +5,7 @@ export type Civ1Package =
   | 'civ1-barbarians'
   | 'civ1-city'
   | 'civ1-city-improvement'
+  | 'civ1-science'
   | 'civ1-unit'
   | 'civ1-wonder';
 export type Package = Civ1Package | 'civ1-enhanced';
@@ -12,6 +13,11 @@ export type Package = Civ1Package | 'civ1-enhanced';
 export declare const pluginOrder: Package[];
 /** Every Civ1 package whose rules this one's sets change. */
 export declare const civ1Packages: Civ1Package[];
+/**
+ * Those and `civ1-science`, whose cost rule `FIXED_RESEARCH_COSTS` takes the place of: for the tests of every set
+ * together. Not loaded by the others, as its rule giving each player added research would clash with theirs.
+ */
+export declare const everyPackage: Civ1Package[];
 /**
  * A game with the Civ1 packages named (all of them unless told otherwise) and this one registered against it, in the
  * order given: the plugin loader's, by name, unless told otherwise. `slots` are the game's own, such as its `rng`.

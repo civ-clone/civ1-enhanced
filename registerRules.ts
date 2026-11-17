@@ -66,6 +66,11 @@ import unitTransferred from './Rules/Unit/transferred';
 import { SETTLERS_WAIT_FOR_SIZE_TWO } from './RuleSets';
 import { SETTLERS_WAIT_RULE } from './RuleIds';
 import cityHold from './Rules/City/hold';
+// civ-clone/web-renderer#1072
+import { COST_RULE as CIV1_COST_RULE } from '@civ-clone/civ1-science/RuleIds';
+import { FIXED_RESEARCH_COSTS } from './RuleSets';
+import { TIERED_COST_RULE } from './RuleIds';
+import researchCost from './Rules/Research/cost';
 
 export const register = (game: Game): void => {
   // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
@@ -138,6 +143,12 @@ export const register = (game: Game): void => {
         SETTLERS_WAIT_FOR_SIZE_TWO,
         { supersedes: [CIV1_CHIEFTAIN_SETTLERS_RULE] },
         SETTLERS_WAIT_RULE
+      ),
+      // civ-clone/web-renderer#1072
+      new RuleSet(
+        FIXED_RESEARCH_COSTS,
+        { enabled: false, supersedes: [CIV1_COST_RULE] },
+        TIERED_COST_RULE
       )
     )
   );
@@ -158,7 +169,9 @@ export const register = (game: Game): void => {
     ...cityHold(game),
     // What a city can no longer build for other reasons than a discovery: as it happens (civ-clone/web-renderer#965).
     ...cityLostImprovements(game),
-    ...cityGainedImprovements(game)
+    ...cityGainedImprovements(game),
+    // civ-clone/web-renderer#1072
+    ...researchCost(game)
   );
 
   // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the
