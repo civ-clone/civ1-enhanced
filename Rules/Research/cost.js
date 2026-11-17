@@ -38,7 +38,8 @@ const getRules = (game) => {
         // The same rate as `civ1-science`'s rule (difficulty, catch-up, doubled from AD), times the advance's weight in
         //  place of the advances known. Without the human's floor of 11 - advances a step: the first tier's weight
         //  already keeps the first advances from costing next to nothing, and keeping the floor too would make the first
-        //  advance cost 4 × 10 = 40 at Chieftain, where civ1-science's costs 10 and this one costs 4 × 6 = 24. An advance with no tier (Future Technology) costs what it does by `civ1-science`'s.
+        //  advance cost 4 × 10 = 40 at Chieftain, where civ1-science's costs 10 and this one costs 4 × 6 = 24. An advance
+        //  with no tier (Future Technology) costs what it does by `civ1-science`'s.
         RuleIds_1.TIERED_COST_RULE, new Effect_1.default((CostAdvance, playerResearch) => (0, cost_2.default)(weights(), (research) => (0, cost_1.rate)(context, research, false), (AnyAdvance, research) => (0, cost_1.costByAdvancesKnown)(context, research))(CostAdvance, playerResearch))),
     ];
 };

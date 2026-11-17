@@ -95,6 +95,9 @@ describe('fixed research costs (civ-clone/web-renderer#1072)', (): void => {
   it("should give civ1-science's cost back when switched off again", (): void => {
     const { game, cost } = setUp();
 
+    // Worked out, and kept, while on.
+    expect(cost(TheRepublic).cost).to.equal(230);
+
     game.ruleSets.set(FIXED_RESEARCH_COSTS, false);
 
     expect(cost(TheRepublic)).to.eql({ rules: [CIV1_COST_RULE], cost: 10 });
