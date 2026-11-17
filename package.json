@@ -53,7 +53,7 @@
     "@civ-clone/base-unit-action-steal-technology": "^0.1.0",
     "@civ-clone/base-unit-trait-founds-cities": "^0.1.0",
     "@civ-clone/base-unit-trait-non-combatant": "^0.1.0",
-    "@civ-clone/civ1-barbarians": "github:civ-clone/civ1-barbarians#feat/m2e-ab2",
+    "@civ-clone/civ1-barbarians": "github:civ-clone/civ1-barbarians",
     "@civ-clone/civ1-city": "github:civ-clone/civ1-city",
     "@civ-clone/civ1-city-improvement": "github:civ-clone/civ1-city-improvement",
     "@civ-clone/civ1-difficulty": "github:civ-clone/civ1-difficulty",
