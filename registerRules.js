@@ -35,6 +35,10 @@ const RuleIds_9 = require("@civ-clone/civ1-science/RuleIds");
 const RuleSets_4 = require("./RuleSets");
 const RuleIds_10 = require("./RuleIds");
 const cost_1 = require("./Rules/Research/cost");
+// civ-clone/web-renderer#1076
+const RuleIds_11 = require("./RuleIds");
+const RuleSets_5 = require("./RuleSets");
+const age_1 = require("./Rules/Research/age");
 const register = (game) => {
     // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
     //  rules running. The sets before their rules, so each rule is switched as it arrives: the Hydro Plant's starts off.
@@ -54,7 +58,9 @@ const register = (game) => {
     //  city for its Settlers is never reached, so it needn't be superseded too.
     new RuleSet_1.default(RuleSets_3.SETTLERS_WAIT_FOR_SIZE_TWO, { supersedes: [RuleIds_6.CHIEFTAIN_SETTLERS_RULE] }, RuleIds_8.SETTLERS_WAIT_RULE), 
     // civ-clone/web-renderer#1072
-    new RuleSet_1.default(RuleSets_4.FIXED_RESEARCH_COSTS, { enabled: false, supersedes: [RuleIds_9.COST_RULE] }, RuleIds_10.TIERED_COST_RULE)));
+    new RuleSet_1.default(RuleSets_4.FIXED_RESEARCH_COSTS, { enabled: false, supersedes: [RuleIds_9.COST_RULE] }, RuleIds_10.TIERED_COST_RULE), 
+    // civ-clone/web-renderer#1076: rules added to Civ1's, so nothing to supersede.
+    new RuleSet_1.default(RuleSets_5.AGES, { enabled: false }, RuleIds_11.AGE_BY_TIER_RULE, RuleIds_11.AGES_JOINED_RULE, RuleIds_11.AGES_SETTLED_RULE, RuleIds_11.REACH_AGE_RULE, RuleIds_11.AGE_REACHED_RULE)));
     game.rules.register(...(0, build_1.default)(game), ...(0, captured_1.default)(game), ...(0, processYield_1.default)(game), ...(0, researchComplete_1.default)(game), ...(0, start_1.default)(game), ...(0, destroyed_1.default)(game), 
     // civ-clone/web-renderer#960
     ...(0, pacified_1.default)(game), ...(0, technologyStolen_1.default)(game), ...(0, detonated_1.default)(game), ...(0, transferred_1.default)(game), 
@@ -63,7 +69,9 @@ const register = (game) => {
     // What a city can no longer build for other reasons than a discovery: as it happens (civ-clone/web-renderer#965).
     ...(0, lostImprovements_1.default)(game), ...(0, gainedImprovements_1.default)(game), 
     // civ-clone/web-renderer#1072
-    ...(0, cost_1.default)(game));
+    ...(0, cost_1.default)(game), 
+    // civ-clone/web-renderer#1076
+    ...(0, age_1.default)(game));
     // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the
     //  civilopedia and the reasons a city can't build something follow the rule with the entry's id.
     game.requirements.add(null, ...Requirements_1.describedRequirements);

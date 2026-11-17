@@ -113,3 +113,15 @@ switching those sets off there means no pollution and no uprisings at all, and t
   (difficulty, catch-up, doubled from AD) without the human's floor of 11 - advances a step. Future Technology has no
   tier and costs what it does by `civ1-science`'s rule. Supersedes `civ1-science:research/cost/by-advances-known`,
   v474.05's, where an advance costs the advances known, plus one, times the rate.
+- `civ1-enhanced:ages` (`AGES`), off to start with: each civilization moves through eight ages as it learns, one for
+  each research tier (civ-clone/web-renderer#1076): Ancient, Classical, Medieval, Renaissance, Industrial, Electric,
+  Modern and Space (`Ages.ts`). Its age is that of the latest tier it knows an advance of, and the first knowing none
+  (`civ1-enhanced:research/age/by-tier`, an `AgeOf` rule from `@civ-clone/base-science-age`), so nothing is saved
+  for it. The first advance it gains of a later tier, however it is gained, starts that age
+  (`civ1-enhanced:research/complete/reach-age`, after `civ1-science`'s rule tells of the advance), and
+  `civ1-enhanced:player/age-reached/emit` tells the engine's listeners (`player:age-reached`, with the player's
+  research, the age and the one before). An advance that jumps a civilization over an age starts only the later one.
+  A civilization added, as the game is set up or when one comes back part-way through a turn with the advances it
+  inherits, starts no age with what it is given until the next turn starts (`civ1-enhanced:player/added/hold-ages`,
+  `civ1-enhanced:turn/start/settle-ages`, `lib/joining`). Rules added to Civ1's, so it
+  supersedes nothing, and can be on with the fixed research costs or without them.

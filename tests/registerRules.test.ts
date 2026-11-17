@@ -13,6 +13,7 @@ import {
   FIXED_RESEARCH_COSTS,
   SETTLERS_WAIT_FOR_SIZE_TWO,
   UNITED_NATIONS_STOPS_COMPUTER_WARS,
+  AGES,
 } from '../RuleSets';
 // The Civ1 rules this package's sets change, and the rules they change them with (civ-clone/web-renderer#954).
 import { Game } from '@civ-clone/core-game/Game';
@@ -35,6 +36,11 @@ import {
   STEAL_RULE,
   TIERED_COST_RULE,
   UNITED_NATIONS_PACIFIED_RULE,
+  AGE_BY_TIER_RULE,
+  AGE_REACHED_RULE,
+  AGES_JOINED_RULE,
+  AGES_SETTLED_RULE,
+  REACH_AGE_RULE,
 } from '../RuleIds';
 import {
   CHIEFTAIN_SETTLERS_RULE as CIV1_CHIEFTAIN_SETTLERS,
@@ -80,6 +86,15 @@ const variants: [string, string, string][] = [
   [FIXED_RESEARCH_COSTS, CIV1_COST, TIERED_COST_RULE],
 ];
 
+// The ages' rules, added to Civ1's, so replacing nothing: off to start with (civ-clone/web-renderer#1076).
+const ageRules = [
+  AGE_BY_TIER_RULE,
+  AGES_JOINED_RULE,
+  AGES_SETTLED_RULE,
+  REACH_AGE_RULE,
+  AGE_REACHED_RULE,
+];
+
 const enabled = (game: Game, id: string): boolean =>
   game.rules.getById(id)!.enabled();
 
@@ -103,7 +118,7 @@ describe('registerRules', (): void => {
     expect((): void => register(game)).not.to.throw();
   });
 
-  it('should hold its thirteen sets under one parent, with the ids exported', (): void => {
+  it('should hold its fourteen sets under one parent, with the ids exported', (): void => {
     const game = loadGame(everyPackage);
 
     expect(ENHANCED).to.equal('civ1-enhanced');
@@ -136,6 +151,7 @@ describe('registerRules', (): void => {
       'civ1-enhanced:settlers-wait-for-size-two'
     );
     expect(FIXED_RESEARCH_COSTS).to.equal('civ1-enhanced:fixed-research-costs');
+    expect(AGES).to.equal('civ1-enhanced:ages');
     expect(game.ruleSets.get(ENHANCED)!.memberIds()).to.eql([
       HYDRO_PLANT_SITE,
       BARBARIAN_LEADER_RANSOM,
@@ -150,7 +166,10 @@ describe('registerRules', (): void => {
       DEFECTORS_STAY_VETERAN,
       SETTLERS_WAIT_FOR_SIZE_TWO,
       FIXED_RESEARCH_COSTS,
+      AGES,
     ]);
+    expect(game.ruleSets.get(AGES)!.supersedes()).to.eql([]);
+    expect(game.ruleSets.get(AGES)!.memberIds()).to.eql(ageRules);
     expect(game.ruleSets.get(HYDRO_PLANT_SITE)!.supersedes()).to.eql([
       CIV1_HYDRO_PLANT_SITE,
     ]);
@@ -196,12 +215,16 @@ describe('registerRules', (): void => {
       expect(enabled(game, civ1Rule), civ1Rule).true;
       expect(enabled(game, rule), rule).false;
     });
+    expect(game.ruleSets.state(AGES)).to.equal('off');
+    ageRules.forEach((id: string): void => {
+      expect(enabled(game, id), id).false;
+    });
 
     // Nothing differs from the defaults, so a save keeps nothing.
     expect(game.ruleSets.choices()).to.eql([]);
   });
 
-  it('should show the parent as mixed, and leave exactly the v474.05 rules running for all thirteen when it is switched off', (): void => {
+  it('should show the parent as mixed, and leave exactly the v474.05 rules running for all fourteen when it is switched off', (): void => {
     const game = loadGame(everyPackage);
 
     expect(game.ruleSets.state(ENHANCED)).to.equal('mixed');
@@ -216,6 +239,9 @@ describe('registerRules', (): void => {
       expect(game.ruleSets.state(set), set).to.equal('off');
       expect(enabled(game, civ1Rule), civ1Rule).true;
       expect(enabled(game, rule), rule).false;
+    });
+    ageRules.forEach((id: string): void => {
+      expect(enabled(game, id), id).false;
     });
     expect(game.ruleSets.validate()).to.eql([]);
   });
@@ -232,6 +258,9 @@ describe('registerRules', (): void => {
     [...replacements, ...variants].forEach(([, civ1Rule, rule]): void => {
       expect(enabled(game, civ1Rule), civ1Rule).false;
       expect(enabled(game, rule), rule).true;
+    });
+    ageRules.forEach((id: string): void => {
+      expect(enabled(game, id), id).true;
     });
     expect(game.ruleSets.validate()).to.eql([]);
   });

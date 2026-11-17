@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@civ-clone/base-civilization-barbarian": "^0.1.1",
+    "@civ-clone/base-science-age": "^0.1.0",
     "@civ-clone/base-science-research-tiered-cost": "^0.1.0",
     "@civ-clone/base-unit-action-industrial-sabotage": "^0.1.0",
     "@civ-clone/base-unit-action-nuclear-attack": "^0.1.0",

@@ -8,10 +8,9 @@ import Cost from '@civ-clone/core-science/Rules/Cost';
 import Effect from '@civ-clone/core-rule/Effect';
 import { Game } from '@civ-clone/core-game/Game';
 import { TIERED_COST_RULE } from '../../RuleIds';
-import prerequisiteCounts from '@civ-clone/base-science-research-tiered-cost/lib/prerequisites';
+import { advanceTiers } from '../../lib/advanceTiers';
 import researchTiers from '../../ResearchTiers';
 import tieredCost from '@civ-clone/base-science-research-tiered-cost/lib/cost';
-import { weightsFor } from '@civ-clone/base-science-research-tiered-cost/lib/tiers';
 
 /** The parts of a game the cost is read from. */
 export type ResearchCostGame = Pick<
@@ -33,30 +32,25 @@ export const getRules = (game: ResearchCostGame): Cost[] => {
       turn: game.turn,
       year: game.year,
     },
-    // Read from the game's advances and `requires` entries when the first cost is asked for: this package is loaded
-    //  before `civ1-science`, so they aren't there yet when it registers, and a plugin's changes to them count. Kept
-    //  only once some advance needs another, so a cost asked for before the entries are added isn't kept for good.
+    // Each advance's tier's weight, worked out again only when the tiers are (`advanceTiers`).
     weights = (() => {
-      let known: Map<typeof Advance, number> | null = null;
+      let from: Map<typeof Advance, number> | null = null,
+        known = new Map<typeof Advance, number>();
 
       return (): Map<typeof Advance, number> => {
-        if (known !== null) {
-          return known;
+        const tiers = advanceTiers(game);
+
+        if (tiers !== from) {
+          from = tiers;
+          known = new Map(
+            [...tiers].map(([AdvanceType, tier]): [typeof Advance, number] => [
+              AdvanceType,
+              researchTiers[tier].weight,
+            ])
+          );
         }
 
-        const counts = prerequisiteCounts(
-            game.advances.filter(
-              (AdvanceType: typeof Advance): boolean => !AdvanceType.repeatable
-            ),
-            game.requirements.entries()
-          ),
-          found = weightsFor(counts, researchTiers);
-
-        if ([...counts.values()].some((count: number): boolean => count > 0)) {
-          known = found;
-        }
-
-        return found;
+        return known;
       };
     })();
 
