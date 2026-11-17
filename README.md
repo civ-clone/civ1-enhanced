@@ -122,6 +122,6 @@ switching those sets off there means no pollution and no uprisings at all, and t
   `civ1-enhanced:player/age-reached/emit` tells the engine's listeners (`player:age-reached`, with the player's
   research, the age and the one before). An advance that jumps a civilization over an age starts only the later one.
   A civilization added, as the game is set up or when one comes back part-way through a turn with the advances it
-  inherits, starts no age with what it is given until the next turn starts (`player/added/hold-ages`,
-  `turn/start/settle-ages`, `lib/joining`). Rules added to Civ1's, so it
+  inherits, starts no age with what it is given until the next turn starts (`civ1-enhanced:player/added/hold-ages`,
+  `civ1-enhanced:turn/start/settle-ages`, `lib/joining`). Rules added to Civ1's, so it
   supersedes nothing, and can be on with the fixed research costs or without them.
