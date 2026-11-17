@@ -111,3 +111,9 @@ export const CATCH_UP_FROM_RENAISSANCE_RULE =
 /** A player is counted as knowing every advance it knows, those it started with too (civ-clone/web-renderer#973). */
 export const EVERY_ADVANCE_COUNT_RULE =
   'civ1-enhanced:research/advance-count/every-advance-known';
+
+/**
+ * Answers `civ1-barbarians`' activity level (`Activity`) with the level chosen in `BARBARIAN_ACTIVITY_LEVEL`
+ *  (civ-clone/web-renderer#1008): the only rule of this package that does.
+ */
+export const BARBARIAN_ACTIVITY_RULE = 'civ1-enhanced:barbarians/activity';

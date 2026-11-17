@@ -145,3 +145,31 @@ switching those sets off there means no pollution and no uprisings at all, and t
   `civ1-science:research/advance-count/gained-in-play`, v474.05's `tech_count`, which counts only those gained in play:
   with this set off, the 0 to 3 random advances each civilization starts with neither make its research dearer nor
   raise its ranking.
+- `civ1-enhanced:barbarian-activity` (`BARBARIAN_ACTIVITY`), off to start with: how active the barbarians are,
+  chosen from `civ1-enhanced:barbarian-activity/level` (`BARBARIAN_ACTIVITY_LEVEL`), a choice of Dormant, Sporadic,
+  Active (the default) and Fierce, or one drawn by the difficulty level (civ-clone/web-renderer#1008). Its rule,
+  `civ1-enhanced:barbarians/activity` (`BARBARIAN_ACTIVITY_RULE`), answers `civ1-barbarians`' activity level
+  (`Activity`, `lib/activity`) with the level's numbers (`BarbarianActivities.ts`); the choice's members
+  (`…/level/dormant` to `…/level/fierce`, and `…/level/random`) only say which. A choice can't start switched off,
+  and switching a set off doesn't reach into a choice, so with this set off (or the parent) nothing answers and the
+  barbarians are v474.05's whatever level is chosen. Rules added to Civ1's, so it supersedes nothing.
+
+  | | Dormant | Sporadic | Active | Fierce |
+  | --- | --- | --- | --- | --- |
+  | First barbarians, turn (5 − level) × | never | 33 | 30 | 27 |
+  | Sea landings, every | never | 16th turn | 8th turn | 8th turn |
+  | Raiders at sea, one more every | | 200 turns | 150 turns | 100 turns, and 1 more |
+  | Uprisings | never | half as likely | | 1 unit more |
+
+  Active is v474.05's numbers exactly (`CLASSIC_ACTIVITY`). Each step is about as far as Civilization II moves its own
+  from one level to the next: its onset moves by 3 a level, its raids come every 16th turn at its second level and every
+  8th above it, its raiders grow by one every 250 − 50 × level turns, and its highest level adds one more. The raiders
+  at sea are never more than the 3 a Frigate holds with their leader, and the ship is a Frigate whenever there are 3.
+  At Dormant a goody hut still releases a horde, as at Civilization II's lowest level. The score doesn't count
+  barbarians, at any level.
+
+  The level drawn (`lib/barbarianActivity`'s `drawnLevel`) is drawn the first time it's asked for, from the game's
+  random numbers, by the difficulty level as Civilization II draws its own, Civ1's five levels taken by their place:
+  Dormant or Sporadic on Chieftain, Sporadic or Active on Lord, and Sporadic, Active or Fierce from Prince to Emperor,
+  each as likely as the others. It's kept in a `PendingEffect` (`civ1-enhanced:barbarian-activity`, no target) in the
+  game's pending effects, so a save keeps it, and a game that never chooses it draws and keeps nothing.

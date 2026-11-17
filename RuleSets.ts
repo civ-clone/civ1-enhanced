@@ -110,3 +110,13 @@ export const RESEARCH_COST_BY_AGE = 'civ1-enhanced:research-cost-by-age';
  * (`tech_count`). Takes the place of `civ1-science`'s count while it is on, as the game always has. On to start with.
  */
 export const STARTING_ADVANCES_COUNT = 'civ1-enhanced:starting-advances-count';
+
+/**
+ * How active the barbarians are, chosen from `BARBARIAN_ACTIVITY_LEVEL` (civ-clone/web-renderer#1008). Its rule answers
+ * `civ1-barbarians`' activity level with the level chosen; switched off, nothing answers, and the barbarians are
+ * v474.05's whatever is chosen. Off to start with.
+ */
+export const BARBARIAN_ACTIVITY = 'civ1-enhanced:barbarian-activity';
+
+/** The choice of level beneath `BARBARIAN_ACTIVITY`: one member for each of `BarbarianActivities`' levels. */
+export const BARBARIAN_ACTIVITY_LEVEL = `${BARBARIAN_ACTIVITY}/level`;
