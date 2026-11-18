@@ -102,6 +102,17 @@ import { BARBARIAN_ACTIVITY, BARBARIAN_ACTIVITY_LEVEL } from './RuleSets';
 import { DEFAULT_MEMBER, MEMBERS } from './BarbarianActivities';
 import { BARBARIAN_ACTIVITY_RULE } from './RuleIds';
 import barbarianActivity from './Rules/Barbarians/activity';
+// civ-clone/web-renderer#1029
+import {
+  NO_RAILROAD_IN_CITIES_RULE as CIV1_NO_RAILROAD_IN_CITIES_RULE,
+  RAILROAD_MOVEMENT_RULE as CIV1_RAILROAD_MOVEMENT_RULE,
+} from '@civ-clone/civ1-unit/RuleIds';
+import {
+  RAILROAD_IN_CITIES_RULE,
+  RAILROAD_ON_BOTH_SQUARES_RULE,
+} from './RuleIds';
+import { RAILROADS_IN_CITIES } from './RuleSets';
+import railroadsInCities from './Rules/Unit/railroadsInCities';
 
 export const register = (game: Game): void => {
   // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
@@ -218,6 +229,18 @@ export const register = (game: Game): void => {
           { exclusive: true, default: DEFAULT_MEMBER },
           ...MEMBERS
         )
+      ),
+      // civ-clone/web-renderer#1029: today's railroads, so on to start with.
+      new RuleSet(
+        RAILROADS_IN_CITIES,
+        {
+          supersedes: [
+            CIV1_NO_RAILROAD_IN_CITIES_RULE,
+            CIV1_RAILROAD_MOVEMENT_RULE,
+          ],
+        },
+        RAILROAD_IN_CITIES_RULE,
+        RAILROAD_ON_BOTH_SQUARES_RULE
       )
     )
   );
@@ -248,7 +271,9 @@ export const register = (game: Game): void => {
     // civ-clone/web-renderer#973
     ...advanceCount(),
     // civ-clone/web-renderer#1008
-    ...barbarianActivity(game)
+    ...barbarianActivity(game),
+    // civ-clone/web-renderer#1029
+    ...railroadsInCities(game)
   );
 
   // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the

@@ -54,6 +54,11 @@ const RuleSets_8 = require("./RuleSets");
 const BarbarianActivities_1 = require("./BarbarianActivities");
 const RuleIds_16 = require("./RuleIds");
 const activity_1 = require("./Rules/Barbarians/activity");
+// civ-clone/web-renderer#1029
+const RuleIds_17 = require("@civ-clone/civ1-unit/RuleIds");
+const RuleIds_18 = require("./RuleIds");
+const RuleSets_9 = require("./RuleSets");
+const railroadsInCities_1 = require("./Rules/Unit/railroadsInCities");
 const register = (game) => {
     // The ids superseded are imported from their packages, so renaming one breaks this build rather than leaving both
     //  rules running. The sets before their rules, so each rule is switched as it arrives: the Hydro Plant's starts off.
@@ -85,7 +90,14 @@ const register = (game) => {
     new RuleSet_1.default(RuleSets_7.STARTING_ADVANCES_COUNT, { supersedes: [RuleIds_14.ADVANCE_COUNT_RULE] }, RuleIds_15.EVERY_ADVANCE_COUNT_RULE), 
     // civ-clone/web-renderer#1008: a choice can't start off, and a set switched off doesn't reach into one, so the set
     //  holds the one rule that answers with the level, and the choice beneath it only says which.
-    new RuleSet_1.default(RuleSets_8.BARBARIAN_ACTIVITY, { enabled: false }, RuleIds_16.BARBARIAN_ACTIVITY_RULE, new RuleSet_1.default(RuleSets_8.BARBARIAN_ACTIVITY_LEVEL, { exclusive: true, default: BarbarianActivities_1.DEFAULT_MEMBER }, ...BarbarianActivities_1.MEMBERS))));
+    new RuleSet_1.default(RuleSets_8.BARBARIAN_ACTIVITY, { enabled: false }, RuleIds_16.BARBARIAN_ACTIVITY_RULE, new RuleSet_1.default(RuleSets_8.BARBARIAN_ACTIVITY_LEVEL, { exclusive: true, default: BarbarianActivities_1.DEFAULT_MEMBER }, ...BarbarianActivities_1.MEMBERS)), 
+    // civ-clone/web-renderer#1029: today's railroads, so on to start with.
+    new RuleSet_1.default(RuleSets_9.RAILROADS_IN_CITIES, {
+        supersedes: [
+            RuleIds_17.NO_RAILROAD_IN_CITIES_RULE,
+            RuleIds_17.RAILROAD_MOVEMENT_RULE,
+        ],
+    }, RuleIds_18.RAILROAD_IN_CITIES_RULE, RuleIds_18.RAILROAD_ON_BOTH_SQUARES_RULE)));
     game.rules.register(...(0, build_1.default)(game), ...(0, captured_1.default)(game), ...(0, processYield_1.default)(game), ...(0, researchComplete_1.default)(game), ...(0, start_1.default)(game), ...(0, destroyed_1.default)(game), 
     // civ-clone/web-renderer#960
     ...(0, pacified_1.default)(game), ...(0, technologyStolen_1.default)(game), ...(0, detonated_1.default)(game), ...(0, transferred_1.default)(game), 
@@ -102,7 +114,9 @@ const register = (game) => {
     // civ-clone/web-renderer#973
     ...(0, advanceCount_1.default)(), 
     // civ-clone/web-renderer#1008
-    ...(0, activity_1.default)(game));
+    ...(0, activity_1.default)(game), 
+    // civ-clone/web-renderer#1029
+    ...(0, railroadsInCities_1.default)(game));
     // The entry for the Hydro Plant's site rule, which is written by hand: in force while the rule is on, as the
     //  civilopedia and the reasons a city can't build something follow the rule with the entry's id.
     game.requirements.add(null, ...Requirements_1.describedRequirements);

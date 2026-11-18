@@ -2,7 +2,7 @@
 // The ids of the rule sets this package registers (civ-clone/web-renderer#954), for whatever switches them. Each is a
 //  departure from v474.05, and all are beneath `ENHANCED`, so a game can switch them as one.
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BARBARIAN_ACTIVITY_LEVEL = exports.BARBARIAN_ACTIVITY = exports.STARTING_ADVANCES_COUNT = exports.RESEARCH_COST_BY_AGE = exports.AGES = exports.FIXED_RESEARCH_COSTS = exports.SETTLERS_WAIT_FOR_SIZE_TWO = exports.DEFECTORS_STAY_VETERAN = exports.SDI_DEFENSE_SPARES_CITIES = exports.EVEN_ADVANCE_STEALING = exports.UNITED_NATIONS_STOPS_COMPUTER_WARS = exports.BARBARIAN_UPRISINGS = exports.BARBARIAN_CITY_BUILDS = exports.POLLUTION_IN_EVERY_CITY = exports.CAPTURED_CITY_BUILD = exports.OBSOLETE_BUILDS = exports.BARBARIAN_LEADER_RANSOM = exports.HYDRO_PLANT_SITE = exports.ENHANCED = void 0;
+exports.RAILROADS_IN_CITIES = exports.BARBARIAN_ACTIVITY_LEVEL = exports.BARBARIAN_ACTIVITY = exports.STARTING_ADVANCES_COUNT = exports.RESEARCH_COST_BY_AGE = exports.AGES = exports.FIXED_RESEARCH_COSTS = exports.SETTLERS_WAIT_FOR_SIZE_TWO = exports.DEFECTORS_STAY_VETERAN = exports.SDI_DEFENSE_SPARES_CITIES = exports.EVEN_ADVANCE_STEALING = exports.UNITED_NATIONS_STOPS_COMPUTER_WARS = exports.BARBARIAN_UPRISINGS = exports.BARBARIAN_CITY_BUILDS = exports.POLLUTION_IN_EVERY_CITY = exports.CAPTURED_CITY_BUILD = exports.OBSOLETE_BUILDS = exports.BARBARIAN_LEADER_RANSOM = exports.HYDRO_PLANT_SITE = exports.ENHANCED = void 0;
 /** Every rule set of this package. */
 exports.ENHANCED = 'civ1-enhanced';
 /**
@@ -101,4 +101,12 @@ exports.STARTING_ADVANCES_COUNT = 'civ1-enhanced:starting-advances-count';
 exports.BARBARIAN_ACTIVITY = 'civ1-enhanced:barbarian-activity';
 /** The choice of level beneath `BARBARIAN_ACTIVITY`: one member for each of `BarbarianActivities`' levels. */
 exports.BARBARIAN_ACTIVITY_LEVEL = `${exports.BARBARIAN_ACTIVITY}/level`;
+/**
+ * Settlers may build a Railroad on a city's square, and a land unit moves for nothing only between two squares that
+ * both have a Railroad, as the game always has (civ-clone/web-renderer#1029). v474.05 refuses a Railroad on a city's
+ * square, and moves for nothing from a Railroad to any square with a Road, so into a city, or off the end of the line,
+ * for nothing, and out of a city for a road move. Takes the place of `civ1-unit`'s two rules while it is on. On to
+ * start with.
+ */
+exports.RAILROADS_IN_CITIES = 'civ1-enhanced:railroads-in-cities';
 //# sourceMappingURL=RuleSets.js.map
