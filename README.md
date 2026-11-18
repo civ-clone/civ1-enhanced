@@ -179,4 +179,5 @@ switching those sets off there means no pollution and no uprisings at all, and t
   game always has (civ-clone/web-renderer#1029). It takes the place of `civ1-unit`'s
   `civ1-unit:tile-improvement/build-on-city-square/no-railroad` and `civ1-unit:unit/movement-cost/railroad`: with this
   set off, as in v474.05, a city takes no Railroad, and a train runs for nothing from a Railroad to any square with a
-  Road, so into a city and off the end of the line, and out of a city for a road move.
+  Road, so into a city and off the end of the line, and out of a city for a road move. Switching it off keeps the
+  Railroads cities already have, with their yield and free movement: v474.05 never has one to lose.
