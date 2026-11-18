@@ -20,7 +20,10 @@ const getRules = (game) => {
         .getByTile(tile)
         .some((improvement) => improvement instanceof Improvement);
     return [
-        new BuildOnCitySquare_1.default(RuleIds_1.RAILROAD_IN_CITIES_RULE, new Criterion_1.default((Improvement) => Improvement === TileImprovements_1.Railroad), new Effect_1.default(() => true)),
+        // What allows a city's Railroad is superseding `civ1-unit`'s refusal: a `BuildOnCitySquare` rule that answers `true`
+        //  can't undo another's `false`. This says so where the rules are listed, and gives the set a rule of its own, as a
+        //  set with nothing to switch can't be switched.
+        new BuildOnCitySquare_1.default(RuleIds_1.RAILROAD_IN_CITIES_RULE, new Criterion_1.default((tile, Improvement) => Improvement === TileImprovements_1.Railroad), new Effect_1.default(() => true)),
         new MovementCost_1.default(RuleIds_1.RAILROAD_ON_BOTH_SQUARES_RULE, new Criterion_1.default((unit, action) => action instanceof Actions_1.Move), new Criterion_1.default((unit) => unit instanceof Types_1.Land), new Criterion_1.default((unit, action) => has(action.from(), TileImprovements_1.Railroad)), new Criterion_1.default((unit, action) => has(action.to(), TileImprovements_1.Railroad)), new Effect_1.default(() => 0)),
     ];
 };

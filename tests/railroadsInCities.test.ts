@@ -1,13 +1,18 @@
 import { Railroad, Road } from '@civ-clone/civ1-world/TileImprovements';
 import loadGame, { buildWorld } from './lib/loadGame';
-import BuildOnCitySquare from '@civ-clone/civ1-unit/Rules/BuildOnCitySquare';
 import { Game } from '@civ-clone/core-game/Game';
-import { Move } from '@civ-clone/civ1-unit/Actions';
+import { BuildRailroad, Move } from '@civ-clone/civ1-unit/Actions';
 import Player from '@civ-clone/core-player/Player';
 import { RAILROADS_IN_CITIES } from '../RuleSets';
 import TileImprovement from '@civ-clone/core-tile-improvement/TileImprovement';
-import { Warrior } from '@civ-clone/civ1-unit/Units';
+import { Settlers, Warrior } from '@civ-clone/civ1-unit/Units';
 import World from '@civ-clone/core-world/World';
+import AdvanceRegistry from '@civ-clone/core-science/AdvanceRegistry';
+import City from '@civ-clone/core-city/City';
+import CityGrowth from '@civ-clone/core-city-growth/CityGrowth';
+import PlayerResearch from '@civ-clone/core-science/PlayerResearch';
+import { Railroad as RailroadAdvance } from '@civ-clone/civ1-science/Advances';
+import available from '@civ-clone/civ1-world/Rules/TileImprovement/available';
 import { expect } from 'chai';
 
 // What a move from (1, 1), with `from`, to (2, 1), with `to`, costs a land unit.
@@ -39,18 +44,32 @@ const moveCost = (
   ).movementCost();
 };
 
-// Whether a Railroad may be built on a city's square, by the `BuildOnCitySquare` rules in force.
+// Whether Settlers on a city's square, whose player knows Railroad, are offered BuildRailroad there.
 const railroadOnCitySquare = async (game: Game): Promise<boolean> => {
-  const world = await buildWorld(game);
+  const world = await buildWorld(game),
+    player = new Player(game.rules),
+    research = new PlayerResearch(player, new AdvanceRegistry(), game.rules),
+    tile = world.get(2, 2);
 
-  return game.rules
-    .process(
-      BuildOnCitySquare,
-      Railroad,
-      world.get(1, 1),
-      new Player(game.rules)
-    )
-    .every((allowed: boolean): boolean => allowed);
+  // Which tile improvements can be built where, as civ1-world registers them in a game.
+  game.rules.register(...available(game.playerResearch, game.tileImprovements));
+  research.addAdvance(RailroadAdvance);
+  game.playerResearch.register(research);
+  game.tileImprovements.register(new Road(tile, game.rules));
+
+  const city = new City(player, tile, 'Railway', game.rules);
+
+  game.cities.register(city);
+  game.cityGrowth.register(new CityGrowth(city, game.rules));
+
+  const settlers = new Settlers(city, player, tile, game.rules);
+
+  game.units.register(settlers);
+  settlers.moves().set(settlers.movement());
+
+  return settlers
+    .actions()
+    .some((action): boolean => action instanceof BuildRailroad);
 };
 
 describe('railroads in cities (civ-clone/web-renderer#1029)', (): void => {

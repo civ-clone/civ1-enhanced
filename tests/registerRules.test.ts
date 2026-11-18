@@ -281,7 +281,7 @@ describe('registerRules', (): void => {
     expect(game.ruleSets.choices()).to.eql([]);
   });
 
-  it('should show the parent as mixed, and leave exactly the v474.05 rules running for all fourteen when it is switched off', (): void => {
+  it('should show the parent as mixed, and leave exactly the v474.05 rules running for all seventeen it supersedes when it is switched off', (): void => {
     const game = loadGame(everyPackage);
 
     expect(game.ruleSets.state(ENHANCED)).to.equal('mixed');

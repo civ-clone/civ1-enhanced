@@ -1,4 +1,4 @@
-import { Railroad, Road } from '@civ-clone/civ1-world/TileImprovements';
+import { Railroad } from '@civ-clone/civ1-world/TileImprovements';
 import {
   RAILROAD_IN_CITIES_RULE,
   RAILROAD_ON_BOTH_SQUARES_RULE,
@@ -33,10 +33,13 @@ export const getRules = (
       );
 
   return [
+    // What allows a city's Railroad is superseding `civ1-unit`'s refusal: a `BuildOnCitySquare` rule that answers `true`
+    //  can't undo another's `false`. This says so where the rules are listed, and gives the set a rule of its own, as a
+    //  set with nothing to switch can't be switched.
     new BuildOnCitySquare(
       RAILROAD_IN_CITIES_RULE,
       new Criterion(
-        (Improvement: typeof TileImprovement): boolean =>
+        (tile: Tile, Improvement: typeof TileImprovement): boolean =>
           Improvement === Railroad
       ),
       new Effect((): boolean => true)
