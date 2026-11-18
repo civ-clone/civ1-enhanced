@@ -120,3 +120,12 @@ export const BARBARIAN_ACTIVITY = 'civ1-enhanced:barbarian-activity';
 
 /** The choice of level beneath `BARBARIAN_ACTIVITY`: one member for each of `BarbarianActivities`' levels. */
 export const BARBARIAN_ACTIVITY_LEVEL = `${BARBARIAN_ACTIVITY}/level`;
+
+/**
+ * Settlers may build a Railroad on a city's square, and a land unit moves for nothing only between two squares that
+ * both have a Railroad, as the game always has (civ-clone/web-renderer#1029). v474.05 refuses a Railroad on a city's
+ * square, and moves for nothing from a Railroad to any square with a Road, so into a city, or off the end of the line,
+ * for nothing, and out of a city for a road move. Takes the place of `civ1-unit`'s two rules while it is on. On to
+ * start with.
+ */
+export const RAILROADS_IN_CITIES = 'civ1-enhanced:railroads-in-cities';

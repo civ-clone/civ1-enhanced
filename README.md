@@ -173,3 +173,10 @@ switching those sets off there means no pollution and no uprisings at all, and t
   Dormant or Sporadic on Chieftain, Sporadic or Active on Lord, and Sporadic, Active or Fierce from Prince to Emperor,
   each as likely as the others. It's kept in a `PendingEffect` (`civ1-enhanced:barbarian-activity`, no target) in the
   game's pending effects, so a save keeps it, and a game that never chooses it draws and keeps nothing.
+- `civ1-enhanced:railroads-in-cities` (`RAILROADS_IN_CITIES`), on to start with: Settlers may build a Railroad on a
+  city's square (`civ1-enhanced:tile-improvement/build-on-city-square/railroad`), and a land unit moves for nothing only
+  between two squares that both have a Railroad (`civ1-enhanced:unit/movement-cost/railroad-on-both-squares`), as the
+  game always has (civ-clone/web-renderer#1029). It takes the place of `civ1-unit`'s
+  `civ1-unit:tile-improvement/build-on-city-square/no-railroad` and `civ1-unit:unit/movement-cost/railroad`: with this
+  set off, as in v474.05, a city takes no Railroad, and a train runs for nothing from a Railroad to any square with a
+  Road, so into a city and off the end of the line, and out of a city for a road move.

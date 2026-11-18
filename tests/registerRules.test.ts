@@ -17,6 +17,7 @@ import {
   AGES,
   RESEARCH_COST_BY_AGE,
   STARTING_ADVANCES_COUNT,
+  RAILROADS_IN_CITIES,
 } from '../RuleSets';
 // The Civ1 rules this package's sets change, and the rules they change them with (civ-clone/web-renderer#954).
 import { Game } from '@civ-clone/core-game/Game';
@@ -47,10 +48,14 @@ import {
   RATE_MULTIPLIER_BY_AGE_RULE,
   REACH_AGE_RULE,
   EVERY_ADVANCE_COUNT_RULE,
+  RAILROAD_IN_CITIES_RULE,
+  RAILROAD_ON_BOTH_SQUARES_RULE,
 } from '../RuleIds';
 import {
   CHIEFTAIN_SETTLERS_RULE as CIV1_CHIEFTAIN_SETTLERS,
   HALVE_CITIES_RULE as CIV1_HALVE_CITIES,
+  NO_RAILROAD_IN_CITIES_RULE as CIV1_NO_RAILROAD_IN_CITIES,
+  RAILROAD_MOVEMENT_RULE as CIV1_RAILROAD_MOVEMENT,
   START_AFRESH_RULE as CIV1_START_AFRESH,
   STEAL_RULE as CIV1_STEAL,
 } from '@civ-clone/civ1-unit/RuleIds';
@@ -88,6 +93,9 @@ const replacements: [string, string, string][] = [
   [SETTLERS_WAIT_FOR_SIZE_TWO, CIV1_CHIEFTAIN_SETTLERS, SETTLERS_WAIT_RULE],
   // civ-clone/web-renderer#973
   [STARTING_ADVANCES_COUNT, CIV1_ADVANCE_COUNT, EVERY_ADVANCE_COUNT_RULE],
+  // civ-clone/web-renderer#1029
+  [RAILROADS_IN_CITIES, CIV1_NO_RAILROAD_IN_CITIES, RAILROAD_IN_CITIES_RULE],
+  [RAILROADS_IN_CITIES, CIV1_RAILROAD_MOVEMENT, RAILROAD_ON_BOTH_SQUARES_RULE],
 ];
 
 // Each new variant that takes the place of a Civ1 rule, the rule it takes the place of, and its own: all off to start
@@ -138,7 +146,7 @@ describe('registerRules', (): void => {
     expect((): void => register(game)).not.to.throw();
   });
 
-  it('should hold its seventeen sets under one parent, with the ids exported', (): void => {
+  it('should hold its eighteen sets under one parent, with the ids exported', (): void => {
     const game = loadGame(everyPackage);
 
     expect(ENHANCED).to.equal('civ1-enhanced');
@@ -177,6 +185,7 @@ describe('registerRules', (): void => {
       'civ1-enhanced:starting-advances-count'
     );
     expect(BARBARIAN_ACTIVITY).to.equal('civ1-enhanced:barbarian-activity');
+    expect(RAILROADS_IN_CITIES).to.equal('civ1-enhanced:railroads-in-cities');
     expect(game.ruleSets.get(ENHANCED)!.memberIds()).to.eql([
       HYDRO_PLANT_SITE,
       BARBARIAN_LEADER_RANSOM,
@@ -195,6 +204,7 @@ describe('registerRules', (): void => {
       RESEARCH_COST_BY_AGE,
       STARTING_ADVANCES_COUNT,
       BARBARIAN_ACTIVITY,
+      RAILROADS_IN_CITIES,
     ]);
     expect(game.ruleSets.get(RESEARCH_COST_BY_AGE)!.supersedes()).to.eql(
       byAge.map(([civ1Rule]) => civ1Rule)
@@ -223,9 +233,18 @@ describe('registerRules', (): void => {
     OBSOLETE_BUILDS_RULES.forEach((id: string): void => {
       expect(game.rules.getById(id), id).not.to.be.null;
     });
-    [...replacements, ...variants].forEach(([set, civ1Rule, rule]): void => {
-      expect(game.ruleSets.get(set)!.supersedes(), set).to.eql([civ1Rule]);
-      expect(game.ruleSets.get(set)!.memberIds(), set).to.eql([rule]);
+    // A set may take the place of more than one rule (`RAILROADS_IN_CITIES`), one of its own for each.
+    [...replacements, ...variants].forEach(([set]): void => {
+      const own = [...replacements, ...variants].filter(
+        ([other]): boolean => other === set
+      );
+
+      expect(game.ruleSets.get(set)!.supersedes(), set).to.eql(
+        own.map(([, civ1Rule]) => civ1Rule)
+      );
+      expect(game.ruleSets.get(set)!.memberIds(), set).to.eql(
+        own.map(([, , rule]) => rule)
+      );
     });
   });
 
@@ -333,6 +352,8 @@ describe('registerRules', (): void => {
       CIV1_RATE_MULTIPLIER,
       CIV1_CATCH_UP,
       CIV1_ADVANCE_COUNT,
+      CIV1_NO_RAILROAD_IN_CITIES,
+      CIV1_RAILROAD_MOVEMENT,
     ]);
     superseded.forEach((id: string): void => {
       expect(game.rules.getById(id), id).not.to.be.null;
@@ -501,6 +522,7 @@ describe('registerRules', (): void => {
       { id: EVEN_ADVANCE_STEALING, value: false },
       { id: SETTLERS_WAIT_FOR_SIZE_TWO, value: false },
       { id: STARTING_ADVANCES_COUNT, value: false },
+      { id: RAILROADS_IN_CITIES, value: false },
     ]);
     expect(restored.ruleSets.restore(choices)).to.eql([]);
     expect(restored.ruleSets.state(ENHANCED)).to.equal('off');

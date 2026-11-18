@@ -83,3 +83,12 @@ export declare const EVERY_ADVANCE_COUNT_RULE =
  */
 export declare const BARBARIAN_ACTIVITY_RULE =
   'civ1-enhanced:barbarians/activity';
+/** Settlers may build a Railroad on a city's square (civ-clone/web-renderer#1029). A `BuildOnCitySquare` rule. */
+export declare const RAILROAD_IN_CITIES_RULE =
+  'civ1-enhanced:tile-improvement/build-on-city-square/railroad';
+/**
+ * A land unit moves for nothing between two squares that both have a Railroad (civ-clone/web-renderer#1029). A
+ * `MovementCost` rule.
+ */
+export declare const RAILROAD_ON_BOTH_SQUARES_RULE =
+  'civ1-enhanced:unit/movement-cost/railroad-on-both-squares';
