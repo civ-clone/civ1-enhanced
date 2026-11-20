@@ -3,7 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRules = void 0;
 const nuclear_1 = require("@civ-clone/civ1-unit/lib/nuclear");
 const Detonated_1 = require("@civ-clone/base-unit-action-nuclear-attack/Rules/Detonated");
+const Description_1 = require("@civ-clone/core-rule/Description");
 const Effect_1 = require("@civ-clone/core-rule/Effect");
+const CityImprovements_1 = require("@civ-clone/civ1-city-improvement/CityImprovements");
 const RuleIds_1 = require("../../RuleIds");
 const Priority_1 = require("@civ-clone/core-rule/Priority");
 /**
@@ -21,7 +23,14 @@ const getRules = (game) => [
             return;
         }
         (0, nuclear_1.halveCity)(city, unit, game.cityGrowth);
-    }))),
+    })), 
+    // What SDI Defense does here as well, for the Civilopedia (civ-clone/web-renderer#1196).
+    new Description_1.default({
+        type: 'protects_from',
+        subject: CityImprovements_1.SdiDefence,
+        event: 'nuclear_attack',
+        what: 'size',
+    })),
 ];
 exports.getRules = getRules;
 exports.default = exports.getRules;
