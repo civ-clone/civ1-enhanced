@@ -5,7 +5,7 @@ const nuclear_1 = require("@civ-clone/civ1-unit/lib/nuclear");
 const Detonated_1 = require("@civ-clone/base-unit-action-nuclear-attack/Rules/Detonated");
 const Description_1 = require("@civ-clone/core-rule/Description");
 const Effect_1 = require("@civ-clone/core-rule/Effect");
-const CityImprovements_1 = require("@civ-clone/library-city/CityImprovements");
+const CityImprovements_1 = require("@civ-clone/civ1-city-improvement/CityImprovements");
 const RuleIds_1 = require("../../RuleIds");
 const Priority_1 = require("@civ-clone/core-rule/Priority");
 /**
