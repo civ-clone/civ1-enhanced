@@ -4,7 +4,9 @@ import {
   hasSdiDefence,
 } from '@civ-clone/civ1-unit/lib/nuclear';
 import Detonated from '@civ-clone/base-unit-action-nuclear-attack/Rules/Detonated';
+import Description from '@civ-clone/core-rule/Description';
 import Effect from '@civ-clone/core-rule/Effect';
+import { SdiDefence } from '@civ-clone/library-city/CityImprovements';
 import { Game } from '@civ-clone/core-game';
 import { HALVE_CITIES_RULE } from '../../RuleIds';
 import Priority from '@civ-clone/core-rule/Priority';
@@ -35,7 +37,14 @@ export const getRules = (
 
         halveCity(city, unit, game.cityGrowth);
       })
-    )
+    ),
+    // What SDI Defense does here as well, for the Civilopedia (civ-clone/web-renderer#1196).
+    new Description({
+      type: 'protects_from',
+      subject: SdiDefence,
+      event: 'nuclear_attack',
+      what: 'size',
+    })
   ),
 ];
 

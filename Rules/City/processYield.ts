@@ -1,5 +1,6 @@
 import City from '@civ-clone/core-city/City';
 import Criterion from '@civ-clone/core-rule/Criterion';
+import Description from '@civ-clone/core-rule/Description';
 import Effect from '@civ-clone/core-rule/Effect';
 import { Game } from '@civ-clone/core-game';
 import { POLLUTION_RULE } from '../../RuleIds';
@@ -7,6 +8,7 @@ import ProcessYield from '@civ-clone/core-city/Rules/ProcessYield';
 import { Production } from '@civ-clone/civ1-city-improvement/Yields';
 import Yield from '@civ-clone/core-yield/Yield';
 import pollute from '@civ-clone/civ1-city-improvement/lib/pollute';
+import { pollutionDescriptions } from '@civ-clone/civ1-city-improvement/lib/pollution';
 
 export type PollutionGame = Pick<
   Game,
@@ -46,7 +48,9 @@ export const getRules = (game: PollutionGame): ProcessYield[] => [
         engine: game.engine,
         randomNumberGenerator: game.rng,
       })
-    )
+    ),
+    // What Civ1's rule says about pollution, as this takes its place (civ-clone/web-renderer#1196).
+    new Description(...pollutionDescriptions())
   ),
 ];
 

@@ -2,11 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRules = void 0;
 const Criterion_1 = require("@civ-clone/core-rule/Criterion");
+const Description_1 = require("@civ-clone/core-rule/Description");
 const Effect_1 = require("@civ-clone/core-rule/Effect");
 const RuleIds_1 = require("../../RuleIds");
 const ProcessYield_1 = require("@civ-clone/core-city/Rules/ProcessYield");
 const Yields_1 = require("@civ-clone/civ1-city-improvement/Yields");
 const pollute_1 = require("@civ-clone/civ1-city-improvement/lib/pollute");
+const pollution_1 = require("@civ-clone/civ1-city-improvement/lib/pollution");
 /**
  * Each turn every city with pollution may pollute one of the 20 squares around it, the computer players' as well as the
  * human's (Dom's decision on civ-clone/web-renderer#32), through `civ1-city-improvement`'s `lib/pollute`. v474.05
@@ -26,7 +28,9 @@ const getRules = (game) => [
         ruleRegistry: game.rules,
         engine: game.engine,
         randomNumberGenerator: game.rng,
-    }))),
+    })), 
+    // What Civ1's rule says about pollution, as this takes its place (civ-clone/web-renderer#1196).
+    new Description_1.default(...(0, pollution_1.pollutionDescriptions)())),
 ];
 exports.getRules = getRules;
 exports.default = exports.getRules;
