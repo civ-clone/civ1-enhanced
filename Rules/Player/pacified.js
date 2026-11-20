@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRules = void 0;
 const Criterion_1 = require("@civ-clone/core-rule/Criterion");
+const Description_1 = require("@civ-clone/core-rule/Description");
 const Effect_1 = require("@civ-clone/core-rule/Effect");
 const Pacified_1 = require("@civ-clone/library-diplomacy/Rules/Player/Pacified");
 const RuleIds_1 = require("../../RuleIds");
@@ -16,7 +17,9 @@ const hasWonder_1 = require("@civ-clone/civ1-wonder/Rules/lib/hasWonder");
  */
 const getRules = (game) => [
     new Pacified_1.default(RuleIds_1.UNITED_NATIONS_PACIFIED_RULE, new Criterion_1.default((player, other) => player !== other &&
-        (0, hasWonder_1.playerOwnsWonder)(other, Wonders_1.UnitedNations, game.wonders, game.playerResearch, game.requirements)), new Effect_1.default(() => true)),
+        (0, hasWonder_1.playerOwnsWonder)(other, Wonders_1.UnitedNations, game.wonders, game.playerResearch, game.requirements)), new Effect_1.default(() => true), 
+    // What it does, as Civ1's rule says (civ-clone/web-renderer#1196).
+    new Description_1.default({ type: 'pacifies', subject: Wonders_1.UnitedNations })),
 ];
 exports.getRules = getRules;
 exports.default = exports.getRules;

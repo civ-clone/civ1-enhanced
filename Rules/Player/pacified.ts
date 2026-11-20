@@ -1,4 +1,5 @@
 import Criterion from '@civ-clone/core-rule/Criterion';
+import Description from '@civ-clone/core-rule/Description';
 import Effect from '@civ-clone/core-rule/Effect';
 import { Game } from '@civ-clone/core-game';
 import Pacified from '@civ-clone/library-diplomacy/Rules/Player/Pacified';
@@ -30,7 +31,9 @@ export const getRules = (
           game.requirements
         )
     ),
-    new Effect((): boolean => true)
+    new Effect((): boolean => true),
+    // What it does, as Civ1's rule says (civ-clone/web-renderer#1196).
+    new Description({ type: 'pacifies', subject: UnitedNations })
   ),
 ];
 
