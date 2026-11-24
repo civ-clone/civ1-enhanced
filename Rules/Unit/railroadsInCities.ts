@@ -6,6 +6,7 @@ import {
 import Action from '@civ-clone/core-unit/Action';
 import BuildOnCitySquare from '@civ-clone/civ1-unit/Rules/BuildOnCitySquare';
 import Criterion from '@civ-clone/core-rule/Criterion';
+import Description from '@civ-clone/core-rule/Description';
 import Effect from '@civ-clone/core-rule/Effect';
 import { Game } from '@civ-clone/core-game';
 import { Land } from '@civ-clone/civ1-unit/Types';
@@ -56,7 +57,12 @@ export const getRules = (
       new Criterion((unit: Unit, action: Action): boolean =>
         has(action.to(), Railroad)
       ),
-      new Effect((): number => 0)
+      new Effect((): number => 0),
+      // What a railroad gives, for the Civilopedia (civ-clone/web-renderer#1272), as `civ1-unit`'s rule says it.
+      new Description({
+        type: 'route_free',
+        subject: Railroad,
+      })
     ),
   ];
 };
